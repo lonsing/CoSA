@@ -650,7 +650,6 @@ class Modules(object):
         trans = TRUE()
         invar = TRUE()
 
-        print(empty, EqualsOrIff(wrPtr, rdPtr), Minus(wrPtr, rdPtr), full, depth)
         invar = And(EqualsOrIff(empty, Ite(EqualsOrIff(wrPtr, rdPtr), BV(1, 1) , BV(0, 1))), EqualsOrIff(full, Ite(EqualsOrIff(Minus(wrPtr, rdPtr) , Int(depth)), BV(1, 1), BV(0, 1))))
 
         if clk.symbol_type() == BOOL:
@@ -680,7 +679,7 @@ class Modules(object):
             trans = And(Implies(do_clk, act_trans), Implies(Not(do_clk), pas_trans))
 
         trans = And(trans, EqualsOrIff(TS.to_next(wrPtr), Ite(EqualsOrIff(rst, BV(1, 1)), Int(0), Ite(push1, Plus(wrPtr, Int(1)), wrPtr))))
-        trans = And(trans, EqualsOrIff(TS.to_next(rdPtr), Ite(EqualsOrIff(rst, BV(1, 1)), Int(0), Ite(push1, Plus(rdPtr, Int(1)), wrPtr))))
+        trans = And(trans, EqualsOrIff(TS.to_next(rdPtr), Ite(EqualsOrIff(rst, BV(1, 1)), Int(0), Ite(EqualsOrIff(pop, BV(1, 1)), Plus(rdPtr, Int(1)), rdPtr))))
 
         ts = TS(vars_, init, trans, invar)
         ts.state_vars = set([fifo])
