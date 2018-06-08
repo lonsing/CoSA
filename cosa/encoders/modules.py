@@ -685,6 +685,7 @@ class Modules(object):
         ts = TS(vars_, init, trans, invar)
         ts.state_vars = set([fifo])
         ts.comment = "Abstraction of a FIFO using an array"
+        ts.logic = L_ABV
 
         return ts
 

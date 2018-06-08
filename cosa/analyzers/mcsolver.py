@@ -237,11 +237,26 @@ class BMCSolver(object):
                     self._write_smt2_log(solver, "(declare-fun %s () Bool)" % (v.symbol_name()))
                 elif v.symbol_type().is_array_type():
                     st = v.symbol_type()
-                    assert st.index_type.is_bv_type(), "Expecting BV indices"
-                    assert st.elem_type.is_bv_type(), "Expecting BV elements"
-                    self._write_smt2_log(solver, "(declare-fun %s () (Array (_ BitVec %s) (_ BitVec %s)))"%(v.symbol_name(), st.index_type.width, st.elem_type.width))
+
+                    if st.index_type.is_bv_type():
+                        itypestr = "(_ BitVec %d)"%st.index_type.width
+                    elif st.index_type.is_int_type():
+                        itypestr = "Int"
+                    else:
+                        raise RuntimeError("Unhandled type in Array indices")
+
+                    if st.elem_type.is_bv_type():
+                        etypestr = "(_ BitVec %d)"%st.elem_type.width
+                    elif st.elem_type.is_int_type():
+                        etypestr = "Int"
+                    else:
+                        raise RuntimeError("Unhandled type in Array elements")
+
+                    self._write_smt2_log(solver, "(declare-fun %s () (Array %s %s))"%(v.symbol_name(), itypestr, etypestr))
                 elif v.symbol_type().is_bv_type():
                     self._write_smt2_log(solver, "(declare-fun %s () (_ BitVec %s))" % (v.symbol_name(), v.symbol_type().width))
+                elif v.symbol_type().is_int_type():
+                    self._write_smt2_log(solver, "(declare-fun %s () Int)"%(v.symbol_name()))
                 else:
                     raise RuntimeError("Unhandled type in smt2 translation")
 
