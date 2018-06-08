@@ -13,8 +13,8 @@ from pysmt.shortcuts import get_env, Symbol, BV, simplify, \
     And, Implies, Iff, Not, BVAnd, EqualsOrIff, Ite, Or, Xor, \
     BVExtract, BVSub, BVOr, BVAdd, BVXor, BVMul, BVNot, BVZExt, \
     BVLShr, BVLShl, BVAShr, BVULT, BVUGT, BVUGE, BVULE, BVConcat, \
-    Array, Select, Store
-from pysmt.typing import BOOL, BVType, ArrayType
+    Array, Select, Store, Plus, Minus, Int
+from pysmt.typing import BOOL, BVType, ArrayType, INT
 
 from cosa.transition_systems import TS, HTS, L_BV, L_ABV
 from cosa.utils.logger import Logger
@@ -637,6 +637,55 @@ class Modules(object):
         ts = TS(vars_, init, trans, invar)
         ts.state_vars = set()
         ts.comment = "Terminate wire"
+        return ts
+
+    def FIFO(clk, rst, push, pop, data_in, full, empty, data_out):
+        depth = 8 # hacky -- hardcoded depth
+        wrPtr = Symbol("wrPtr", INT)
+        rdPtr = Symbol("rdPtr", INT)
+        fifo = Symbol("abstract_fifo", ArrayType(wrPtr.symbol_type(), data_in.symbol_type()))
+        vars_ = [clk, rst, push, pop, data_in, full, empty, data_out, wrPtr, rdPtr, fifo]
+
+        init = TRUE()
+        trans = TRUE()
+        invar = TRUE()
+
+        print(empty, EqualsOrIff(wrPtr, rdPtr), Minus(wrPtr, rdPtr), full, depth)
+        invar = And(EqualsOrIff(empty, Ite(EqualsOrIff(wrPtr, rdPtr), BV(1, 1) , BV(0, 1))), EqualsOrIff(full, Ite(EqualsOrIff(Minus(wrPtr, rdPtr) , Int(depth)), BV(1, 1), BV(0, 1))))
+
+        if clk.symbol_type() == BOOL:
+            clk0 = Not(clk)
+            clk1 = clk
+        else:
+            clk0 = EqualsOrIff(clk, BV(0, 1))
+            clk1 = EqualsOrIff(clk, BV(1, 1))
+
+        if push.symbol_type() == BOOL:
+            push1 = push
+        else:
+            push1 = EqualsOrIff(push, BV(1, 1))
+
+        if Modules.abstract_clock:
+            do_clk = TRUE()
+        else:
+            do_clk = And(TS.to_next(clk1), clk0)
+
+        invar = And(invar, EqualsOrIff(data_out, Select(fifo, rdPtr)))
+
+        if Modules.functional:
+            trans = EqualsOrIff(TS.to_next(fifo), Ite(do_clk, Ite(push1, Store(fifo, wrPtr, data_in), fifo), fifo))
+        else:
+            act_trans = EqualsOrIff(TS.to_next(fifo), Ite(push1, Store(fifo, wrPtr, data_in), fifo))
+            pas_trans = EqualsOrIff(TS.to_next(fifo), fifo)
+            trans = And(Implies(do_clk, act_trans), Implies(Not(do_clk), pas_trans))
+
+        trans = And(trans, EqualsOrIff(TS.to_next(wrPtr), Ite(EqualsOrIff(rst, BV(1, 1)), Int(0), Ite(push1, Plus(wrPtr, Int(1)), wrPtr))))
+        trans = And(trans, EqualsOrIff(TS.to_next(rdPtr), Ite(EqualsOrIff(rst, BV(1, 1)), Int(0), Ite(push1, Plus(rdPtr, Int(1)), wrPtr))))
+
+        ts = TS(vars_, init, trans, invar)
+        ts.state_vars = set([fifo])
+        ts.comment = "Abstraction of a FIFO using an array"
+
         return ts
 
 class ModuleSymbols(object):

@@ -161,6 +161,14 @@ class CoreIRParser(ModelParser):
         self.attrnames.append(add_name("rdata"))
         self.attrnames.append(add_name("raddr"))
 
+        # fifo interface
+        self.attrnames.append(add_name("data_in"))
+        self.attrnames.append(add_name("data_out"))
+        self.attrnames.append(add_name("push"))
+        self.attrnames.append(add_name("pop"))
+        self.attrnames.append(add_name("empty"))
+        self.attrnames.append(add_name("full"))
+
 
     def _init_mod_map(self):
         mod_map = []
@@ -203,6 +211,7 @@ class CoreIRParser(ModelParser):
         mod_map.append(("concat", (Modules.Concat, [self.IN0, self.IN1, self.OUT])))
 
         mod_map.append(('term', (Modules.Term, [self.IN])))
+        mod_map.append(('fifo', (Modules.FIFO, [self.CLK, self.RST, self.PUSH, self.POP, self.DATA_IN, self.FULL, self.EMPTY, self.DATA_OUT])))
 
         self.mod_map = dict(mod_map)
 
@@ -260,6 +269,7 @@ class CoreIRParser(ModelParser):
             ts = TS(set_remap(enc.vars, remap), self.subwalker.walk(enc.init), self.subwalker.walk(enc.trans), self.subwalker.walk(enc.invar))
             return ts
 
+        print(inst_type)
         ret = self.mod_map[inst_type][0](*args)
         self.enc_map[enc_val] = (ret, actual)
 
