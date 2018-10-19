@@ -13,7 +13,7 @@ from pysmt.shortcuts import Not, TRUE, And, BVNot, BVAnd, BVOr, BVAdd, Or, Symbo
     Xor, Select, Store, BVComp, simplify, BVLShl, BVAShr, BVLShr
 from pysmt.typing import BOOL, BVType, ArrayType
 
-from cosa.representation import HTS, TS
+from cosa.representation import HTS, TS, L_ABV
 from cosa.encoders.formulae import StringParser
 from cosa.utils.logger import Logger
 from cosa.utils.formula_mngm import quote_names, B2BV, BV2B
@@ -149,6 +149,7 @@ class BTOR2Parser(ModelParser):
                 if stype == ARRAY:
                     nodemap[nid] = ArrayType(getnode(attr[0]), getnode(attr[1]))
                     node_covered.add(nid)
+                    hts.update_logic(L_ABV)
 
             if ntype == WRITE:
                 nodemap[nid] = Store(*[getnode(n) for n in nids[1:4]])

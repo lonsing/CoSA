@@ -229,6 +229,8 @@ class HTS(object):
             sub[2].reset_flatten()
             
     def combine(self, other_hts):
+        self.update_logic(other_hts.logic)
+
         for ts in other_hts.tss:
             self.add_ts(ts)
 
