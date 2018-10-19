@@ -113,6 +113,7 @@ class Problems(object):
     skip_solving = False
     smt2_tracing = None
     solver_name = None
+    solver_options = None
     strategy = None
     symbolic_init = False
     time = False
@@ -186,7 +187,8 @@ class Problems(object):
         problem.run_coreir_passes = self.run_coreir_passes 
         problem.skip_solving = self.skip_solving 
         problem.smt2_tracing = self.smt2_tracing 
-        problem.solver_name = self.solver_name 
+        problem.solver_name = self.solver_name
+        problem.solver_options = self.solver_options
         problem.strategy = self.strategy 
         problem.symbolic_init = self.symbolic_init 
         problem.time = self.time 
@@ -285,6 +287,7 @@ class Problem(object):
     skip_solving = False
 
     solver_name = None
+    solver_options = None
 
     def __init__(self):
         self.status = VerificationStatus.UNC
@@ -310,6 +313,7 @@ class Problem(object):
         imp.append(self.clock_behaviors)
         imp.append(self.skip_solving)
         imp.append(self.solver_name)
+        imp.append(solver_options)
         
         return tuple(imp)
     

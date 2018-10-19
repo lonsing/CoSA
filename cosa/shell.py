@@ -39,14 +39,14 @@ class Config(object):
     debug = False
     bmc_length = 10
     bmc_length_min = 0
-    
+
     simulate = False
     safety = None
     parametric = None
     ltl = None
     equivalence = None
     problems = None
-    
+
     properties = None
     lemmas = None
     precondition = None
@@ -66,6 +66,8 @@ class Config(object):
     add_clock = False
     skip_solving = False
     solver_name = "msat"
+    solver_options = {}
+
     vcd = False
     prove = False
     incremental = True
@@ -80,17 +82,17 @@ class Config(object):
 
     printer = None
     strategy = None
-    
+
     def __init__(self):
         HTSPrintersFactory.init_printers()
-        
+
         self.printer = HTSPrintersFactory.get_default().get_name()
         self.strategy = MCConfig.get_strategies()[0][0]
-        
+
 def traces_printed(msg, trace_files):
     traces = ", and\n - ".join(["\"%s\""%f for f in trace_files])
     Logger.log("\n%s saved in:\n - %s"%(msg, traces), 0)
-    
+
 def print_traces(msg, traces, index, prefix, tracecount):
     trace_files = []
     trace_prefix = None
@@ -102,7 +104,7 @@ def print_traces(msg, traces, index, prefix, tracecount):
         else:
             if not trace.human_readable:
                 trace_prefix = TRACE_PREFIX
-        
+
         if trace_prefix:
             trace_file = "%s[%d]-%s.%s"%(trace_prefix, i, index, trace.extension)
             i+=1
@@ -122,17 +124,17 @@ def print_traces(msg, traces, index, prefix, tracecount):
         Logger.log("%s%s: %s"%(msg, "s" if len(traces) > 1 else "", traces_idx), 0)
         tracelen = max(t.length for t in traces)
         Logger.log("Trace%s: %d"%("s (max) length" if len(traces) > 1 else " length", tracelen+1), 0)
-            
+
     if (tracecount < 0) and (len(trace_files) > 0):
         traces_printed(msg, trace_files)
         return []
-    
+
     return trace_files
 
 def get_file_flags(strfile):
     if "[" not in strfile:
         return (strfile, [])
-    
+
     (strfile, flags) = (strfile[:strfile.index("[")], strfile[strfile.index("[")+1:strfile.index("]")].split(FILE_SP))
     return (strfile, flags)
 
@@ -192,7 +194,7 @@ def print_problem_result(pbm, config, count=-1):
     return (ret_status, traces)
 
 def run_problems(problems_file, config, problems=None):
-    
+
     if sys.version_info[0] < 3:
         if config.debug:
             Logger.warning("This software is not tested for Python 2, we recommend to use Python 3 instead")
@@ -202,12 +204,12 @@ def run_problems(problems_file, config, problems=None):
     reset_env()
     Logger.verbosity = config.verbosity
     Logger.time = config.time
-    
+
     psol = ProblemSolver()
     if problems is None:
         problems = Problems()
         problems.load_problems(problems_file)
-        
+
     psol.solve_problems(problems, config)
 
     global_status = 0
@@ -239,7 +241,7 @@ def run_problems(problems_file, config, problems=None):
     if global_status != 0:
         Logger.log("", 0)
         Logger.warning("Verifications with unexpected result")
-        
+
     return global_status
 
 def run_verification(config):
@@ -247,7 +249,7 @@ def run_verification(config):
     Logger.verbosity = config.verbosity
 
     problems = Problems()
-        
+
     problems.assumptions = config.assumptions
     problems.bmc_length = config.bmc_length
     problems.bmc_length_min = config.bmc_length_min
@@ -270,7 +272,7 @@ def run_verification(config):
     problems.trace_vars_change = config.trace_vars_change
     problems.vcd = config.vcd
     problems.verbosity = config.verbosity
-    
+
     problems.model_file = config.strfiles
     problems.boolean = config.boolean
     problems.add_clock = config.add_clock
@@ -299,18 +301,18 @@ def run_verification(config):
         problem.formula = config.properties
 
     problem.name = VerificationType.to_string(problem.verification)
-    
+
     if problem.formula or problem.verification:
         problems.add_problem(problem)
 
     return run_problems(None, config, problems)
-            
+
 def main():
     wrapper = TextWrapper(initial_indent=" - ")
     extra_info = []
 
     extra_info.append(bold_text("\nADDITIONAL INFORMATION:"))
-    
+
     clock_behaviors = []
     for x in ClockBehaviorsFactory.get_clockbehaviors():
         wrapper.subsequent_indent = " "*(len(" - \"\": "+x.get_name()))
@@ -323,7 +325,7 @@ def main():
     for x in SyntacticSugarFactory.get_sugars():
         wrapper.subsequent_indent = " "*(len(" - \"\": "+x.get_name()))
         sugars.append("\n".join(wrapper.wrap("\"%s\": %s, parameters (%s)"%(x.get_name(), x.get_desc(), x.get_interface()))))
-    
+
 
     extra_info.append('\nSpecial operators:\n%s'%("\n".join(sugars)))
 
@@ -331,7 +333,7 @@ def main():
     for x in GeneratorsFactory.get_generators():
         wrapper.subsequent_indent = " "*(len(" - \"\": "+x.get_name()))
         generators.append("\n".join(wrapper.wrap("\"%s\": %s, parameters (%s)"%(x.get_name(), x.get_desc(), x.get_interface()))))
-    
+
     extra_info.append('\nModule generators:\n%s'%("\n".join(generators)))
 
     modifiers = []
@@ -339,9 +341,9 @@ def main():
     for x in ModelModifiersFactory.get_modifiers():
         wrapper.subsequent_indent = " "*(len(" - \"\": "+x.get_name()))
         modifiers.append("\n".join(wrapper.wrap("\"%s\": %s"%(x.get_name(), x.get_desc()))))
-    
+
     extra_info.append('\nModel modifiers:\n%s'%("\n".join(modifiers)))
-    
+
     parser = argparse.ArgumentParser(description=bold_text('CoSA: CoreIR Symbolic Analyzer\n..an SMT-based Symbolic Model Checker for Hardware Design'), \
                                      #usage='%(prog)s [options]', \
                                      formatter_class=RawTextHelpFormatter, \
@@ -358,13 +360,13 @@ def main():
 
     ua_input_types = [" - \"%s\": %s"%(x.name, ", ".join(["*.%s"%e for e in x.extensions])) \
                       for x in ModelParsersFactory.get_parsers() if not x.is_available()]
-    
+
     in_options.set_defaults(input_files=None)
     in_options.add_argument('-i', '--input_files', metavar='<input files>', type=str, required=False,
                             help='comma separated list of input files.\nSupported types:\n%s%s'%\
                             ("\n".join(av_input_types), "\nNot enabled:\n%s"%("\n".join(ua_input_types)) \
                              if len(ua_input_types) > 0 else ""))
-    
+
     in_options.set_defaults(problems=None)
     in_options.add_argument('--problems', metavar='<problems file>', type=str, required=False,
                        help='problems file describing the verifications to be performed.')
@@ -372,7 +374,7 @@ def main():
     # Verification Options
 
     ver_options = parser.add_argument_group('analysis')
-    
+
     ver_options.set_defaults(safety=False)
     ver_options.add_argument('--safety', dest='safety', action='store_true',
                        help='safety verification using BMC.')
@@ -380,7 +382,7 @@ def main():
     ver_options.set_defaults(ltl=False)
     ver_options.add_argument('--ltl', dest='ltl', action='store_true',
                        help='ltl verification using BMC.')
-    
+
     ver_options.set_defaults(simulate=False)
     ver_options.add_argument('--simulate', dest='simulate', action='store_true',
                        help='simulate system using BMC.')
@@ -396,7 +398,7 @@ def main():
     ver_options.set_defaults(parametric=False)
     ver_options.add_argument('--parametric', dest='parametric', action='store_true',
                        help='parametric analysis using BMC.')
-    
+
     # Verification parameters
 
     ver_params = parser.add_argument_group('verification parameters')
@@ -416,7 +418,7 @@ def main():
     ver_params.set_defaults(precondition=None)
     ver_params.add_argument('-c', '--precondition', metavar='<invar>', type=str, required=False,
                        help='invariant properties precondition.')
-    
+
     ver_params.set_defaults(lemmas=None)
     ver_params.add_argument('-l', '--lemmas', metavar='<invar list>', type=str, required=False,
                        help='comma separated list of lemmas.')
@@ -430,7 +432,7 @@ def main():
 
     ver_params.add_argument('--clock-behaviors', metavar='clock_behaviors', type=str, nargs='?',
                         help='semi column separated list of clock behaviors instantiation.')
-    
+
     ver_params.set_defaults(prove=False)
     ver_params.add_argument('--prove', dest='prove', action='store_true',
                        help='use indution to prove the satisfiability of the property.')
@@ -442,7 +444,7 @@ def main():
     ver_params.set_defaults(cardinality=config.cardinality)
     ver_params.add_argument('--cardinality', dest='cardinality', type=int, required=False,
                        help="bounds number of active parameters. -1 is unbounded. (Default is \"%s\")"%config.cardinality)
-    
+
     strategies = [" - \"%s\": %s"%(x[0], x[1]) for x in MCConfig.get_strategies()]
     defstrategy = MCConfig.get_strategies()[0][0]
     ver_params.set_defaults(strategy=defstrategy)
@@ -456,7 +458,10 @@ def main():
     ver_params.set_defaults(solver_name=config.solver_name)
     ver_params.add_argument('--solver-name', metavar='<Solver Name>', type=str, required=False,
                         help="name of SMT solver to be use. (Default is \"%s\")"%config.solver_name)
-    
+    ver_params.set_defaults(solver_options=config.solver_options)
+    ver_params.add_argument('--solver-options', metavar='[key:value options]', type=str, required=False,
+                            help='space delimited key:value pairs to set specific SMT solver options (EXPERTS ONLY)')
+
     # Encoding parameters
 
     enc_params = parser.add_argument_group('encoding')
@@ -464,7 +469,7 @@ def main():
     enc_params.set_defaults(add_clock=False)
     enc_params.add_argument('--add-clock', dest='add_clock', action='store_true',
                        help='adds clock behavior.')
-    
+
     enc_params.set_defaults(abstract_clock=False)
     enc_params.add_argument('--abstract-clock', dest='abstract_clock', action='store_true',
                        help='abstracts the clock behavior.')
@@ -476,7 +481,7 @@ def main():
     enc_params.set_defaults(zero_init=config.zero_init)
     enc_params.add_argument('--zero-init', dest='zero_init', action='store_true',
                        help='sets initial state to zero. (Default is \"%s\")'%config.zero_init)
-    
+
     enc_params.set_defaults(boolean=config.boolean)
     enc_params.add_argument('--boolean', dest='boolean', action='store_true',
                         help='interprets single bits as Booleans instead of 1-bit Bitvector. (Default is \"%s\")'%config.boolean)
@@ -488,7 +493,7 @@ def main():
     enc_params.set_defaults(model_extension=config.model_extension)
     enc_params.add_argument('--model-extension', metavar='model_extension', type=str, nargs='?',
                             help='select the model modifier. (Default is \"%s\")'%(config.model_extension))
-    
+
     # Printing parameters
 
     print_params = parser.add_argument_group('trace printing')
@@ -504,11 +509,11 @@ def main():
     print_params.set_defaults(full_trace=config.full_trace)
     print_params.add_argument('--full-trace', dest='full_trace', action='store_true',
                        help="sets trace-vars-unchanged and trace-all-vars to True. (Default is \"%s\")"%config.full_trace)
-    
+
     print_params.set_defaults(prefix=None)
     print_params.add_argument('--prefix', metavar='<prefix location>', type=str, required=False,
                        help='write the counterexamples with a specified location prefix.')
-    
+
     print_params.set_defaults(vcd=False)
     print_params.add_argument('--vcd', dest='vcd', action='store_true',
                        help='generate traces also in vcd format.')
@@ -516,7 +521,7 @@ def main():
     # Translation parameters
 
     trans_params = parser.add_argument_group('translation')
-    
+
     trans_params.set_defaults(smt2=None)
     trans_params.add_argument('--smt2', metavar='<smt-lib2 file>', type=str, required=False,
                        help='generates the smtlib2 encoding for a BMC call.')
@@ -524,7 +529,7 @@ def main():
     trans_params.set_defaults(translate=None)
     trans_params.add_argument('--translate', metavar='<output file>', type=str, required=False,
                        help='translate input file.')
-    
+
     printers = [" - \"%s\": %s"%(x.get_name(), x.get_desc()) for x in HTSPrintersFactory.get_printers_by_type(HTSPrinterType.TRANSSYS)]
 
     trans_params.set_defaults(printer=config.printer)
@@ -538,7 +543,7 @@ def main():
     # Debugging
 
     deb_params = parser.add_argument_group('verbosity')
-    
+
     deb_params.set_defaults(verbosity=config.verbosity)
     deb_params.add_argument('-v', dest='verbosity', metavar="<integer level>", type=int,
                         help="verbosity level. (Default is \"%s\")"%config.verbosity)
@@ -550,7 +555,7 @@ def main():
     deb_params.set_defaults(time=False)
     deb_params.add_argument('--time', dest='time', action='store_true',
                        help='prints time for every verification.')
-    
+
     args = parser.parse_args()
 
     config.strfiles = args.input_files
@@ -582,6 +587,9 @@ def main():
     config.vcd = args.vcd
     config.prove = args.prove
     config.solver_name = args.solver_name
+    if args.solver_options:
+        # interpret string as a dictionary
+        config.solver_options = dict([tuple([item.strip() for item in kvpair.split(":")]) for kvpair in args.solver_options.split()])
     config.incremental = not args.ninc
     config.time = args.time
     config.add_clock = args.add_clock
@@ -600,7 +608,7 @@ def main():
         config.printer = args.printer
     else:
         Logger.error("Printer \"%s\" not found"%(args.printer))
-        
+
     if args.problems:
         if args.debug:
             sys.exit(run_problems(args.problems, config))
@@ -612,7 +620,7 @@ def main():
                 sys.exit(1)
 
     Logger.error_raise_exept = False
-            
+
     if (args.problems is None) and (args.input_files is None):
         Logger.error("No input files provided")
 
@@ -629,7 +637,7 @@ def main():
         Logger.error("Analysis selection is necessary")
 
     Logger.error_raise_exept = True
-    
+
     if args.debug:
         sys.exit(run_verification(config))
     else:
@@ -641,4 +649,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-            

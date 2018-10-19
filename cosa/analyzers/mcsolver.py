@@ -13,7 +13,7 @@ from six.moves import cStringIO
 from pysmt.shortcuts import BV, And, Or, Solver, TRUE, FALSE, Not, EqualsOrIff, Implies, Iff, Symbol, BOOL, simplify, BVAdd, BVUGE
 from pysmt.rewritings import conjunctive_partition
 from pysmt.smtlib.printers import SmtPrinter, SmtDagPrinter
-from pysmt.logics import QF_ABV
+from pysmt.logics import convert_logic_from_string, QF_BV, QF_ABV
 
 from cosa.utils.logger import Logger
 from cosa.representation import TS, HTS
@@ -42,12 +42,14 @@ class MCConfig(object):
     smt2file = None
     simplify = False
     solver_name = None
+    solver_options = None
     prove = None
 
     def __init__(self):
         self.incremental = True
         self.strategy = VerificationStrategy.AUTO
         self.solver_name = "msat"
+        self.solver_options = dict()
         self.prefix = None
         self.smt2file = None
         self.simplify = False
@@ -74,29 +76,36 @@ class TraceSolver(object):
 
     solver_name = None
     name = None
+    logic = None
+    incremental = None
+    solver_options = None
     basename = None
     trace_file = None
     solver = None
     smt2vars = None
     smt2vars_inc = None
-    
-    def __init__(self, solver_name, name, basename=None):
+
+    def __init__(self, solver_name, name, logic, incremental, solver_options, basename=None):
         self.solver_name = solver_name
         self.name = name
+        self.logic = logic
+        self.incremental = incremental
+        self.solver_options = solver_options
         self.basename = basename
         self.smt2vars = set([])
-        self.solver = Solver(name=solver_name, logic=QF_ABV)
+        self.solver = Solver(name=solver_name, logic=logic, incremental=incremental, solver_options=solver_options)
         self.smt2vars_inc = []
         if basename is not None:
             self.trace_file = "%s-%s.smt2"%(basename, name)
 
     def clear(self):
         self.solver.exit()
-        self.solver = Solver(name=self.solver_name, logic=QF_ABV)
+        self.solver = Solver(name=self.solver_name, logic=self.logic, incremental=self.incremental, solver_options=self.solver_options)
 
     def copy(self, name=None):
-        return TraceSolver(self.solver_name, self.name if name is None else name, self.basename)
-        
+        return TraceSolver(self.solver_name, self.name if name is None else name, logic=self.logic,
+                           incremental=self.incremental, solver_options=self.solver_options, basename=self.basename)
+
 class BMCSolver(object):
 
     def __init__(self, hts, config):
@@ -111,7 +120,9 @@ class BMCSolver(object):
         basename = None
         if self.config.smt2file is not None:
             basename = ".".join(self.config.smt2file.split(".")[:-1])
-        self.solver = TraceSolver(config.solver_name, "main", basename)
+        logic = convert_logic_from_string(self.hts.logic)
+        self.solver = TraceSolver(config.solver_name, "main", logic=logic, incremental=config.incremental,
+                                  solver_options=config.solver_options, basename=basename)
 
         self.varmapf_t = None
         self.varmapb_t = None
@@ -134,9 +145,9 @@ class BMCSolver(object):
 
         if gen_list:
             return formula
-            
+
         return And(formula)
-        
+
     def _remap_model(self, vars, model, k):
         if model is None:
             return model
@@ -158,7 +169,7 @@ class BMCSolver(object):
 
         Logger.error("Invalid configuration strategy")
         return None
-        
+
     def _init_at_time(self, vars, maxtime):
 
         previous = self.config.strategy != VerificationStrategy.FWD
@@ -168,7 +179,7 @@ class BMCSolver(object):
 
         if self.varmapb_t is not None:
             del(self.varmapb_t)
-            
+
         self.varmapf_t = {}
         self.varmapb_t = {}
 
@@ -206,7 +217,7 @@ class BMCSolver(object):
 
     def at_ptime(self, formula, t):
         return substitute(formula, self.varmapb_t[t])
-    
+
     def _write_smt2_log(self, solver, line):
         tracefile = solver.trace_file
         if tracefile is not None:
@@ -231,11 +242,11 @@ class BMCSolver(object):
                 self._write_smt2_comment(solver, "%s: START"%comment)
 
             formula_fv = get_free_variables(formula)
-                
+
             for v in formula_fv:
                 if v in solver.smt2vars:
                     continue
-                
+
                 if v.symbol_type() == BOOL:
                     self._write_smt2_log(solver, "(declare-fun %s () Bool)" % (v.symbol_name()))
                 elif v.symbol_type().is_array_type():
@@ -267,7 +278,7 @@ class BMCSolver(object):
 
             if comment:
                 self._write_smt2_comment(solver, "%s: END"%comment)
-                                
+
 
     def _push(self, solver):
         Logger.log("Push solver \"%s\""%solver.name, 2)
@@ -290,7 +301,7 @@ class BMCSolver(object):
             return dict(solver.solver.get_model())
 
         return dict([(v, solver.solver.get_value(v)) for v in relevant_vars])
-        
+
     def _reset_assertions(self, solver, clear=False):
         if clear:
             solver.clear()
@@ -304,7 +315,7 @@ class BMCSolver(object):
 
     def _solve(self, solver):
         Logger.log("Solve solver \"%s\""%solver.name, 2)
-        
+
         self._write_smt2_log(solver, "(check-sat)")
         self._write_smt2_log(solver, "")
 
@@ -321,7 +332,7 @@ class BMCSolver(object):
             Logger.log("Total time solve: %.2f sec"%self.total_time, 1)
 
         return r
-                
+
 
     def _check_lemma(self, hts, lemma, init, trans):
 
@@ -337,16 +348,16 @@ class BMCSolver(object):
             if res:
                 Logger.log("Lemma \"%s\" failed for I -> L"%lemma, 2)
                 return False
-            
+
             Logger.log("Lemma \"%s\" holds for I -> L"%lemma, 2)
             return True
 
-    
+
     def _suff_lemmas(self, prop, lemmas):
         self._reset_assertions(self.solver)
 
         self._add_assertion(self.solver, And(And(lemmas), Not(prop)))
-        
+
         if self._solve(self.solver):
             return False
 
@@ -360,7 +371,7 @@ class BMCSolver(object):
 
         h_init = hts.single_init()
         h_trans = hts.single_trans()
-        
+
         holding_lemmas = []
         lindex = 1
         nlemmas = len(lemmas)
@@ -375,7 +386,7 @@ class BMCSolver(object):
                 holding_lemmas.append(lemma)
                 hts.add_assumption(lemma)
                 hts.reset_formulae()
-                
+
                 Logger.log("Lemma %s holds"%(lindex), 1)
                 tlemmas += 1
                 if self._suff_lemmas(prop, holding_lemmas):
@@ -383,16 +394,16 @@ class BMCSolver(object):
             else:
                 Logger.log("Lemma %s does not hold"%(lindex), 1)
                 flemmas += 1
-                
+
             msg = "%s T:%s F:%s U:%s"%(status_bar((float(lindex)/float(nlemmas)), False), tlemmas, flemmas, (nlemmas-lindex))
-            Logger.inline(msg, 0, not(Logger.level(1))) 
+            Logger.inline(msg, 0, not(Logger.level(1)))
             lindex += 1
-            
+
         Logger.clear_inline(0, not(Logger.level(1)))
-        
+
         hts.assumptions = And(holding_lemmas)
         return (hts, False)
-    
+
     def _remap_model_fwd(self, vars, model, k):
         return model
 
@@ -405,7 +416,7 @@ class BMCSolver(object):
                     val = model[TS.get_ptimed(var, k-t)]
                 else:
                     val = FALSE() if var.symbol_type() == BOOL else BV(0, var.symbol_type().width)
-                    
+
                 retmodel[TS.get_timed(var, t)] = val
 
         return retmodel
@@ -430,6 +441,5 @@ class BMCSolver(object):
         trace.length = length
         trace.infinite = find_loop
         trace.prop_vars = xvars
-        
+
         return trace
-    
