@@ -219,6 +219,11 @@ class BMCSolver(object):
         return substitute(formula, self.varmapb_t[t])
 
     def _write_smt2_log(self, solver, line):
+        # don't include any escape characters in smt2 output
+        # they can't be quoted away with "|" and should only
+        # be a part of a name, because auto-generated names don't
+        # use escape characters
+        line = line.replace("\\", "")
         tracefile = solver.trace_file
         if tracefile is not None:
             with open(tracefile, "a") as f:
@@ -227,15 +232,19 @@ class BMCSolver(object):
     def _write_smt2_comment(self, solver, line):
         return self._write_smt2_log(solver, ";; %s"%line)
 
+
+    def _formula_to_smt2(self, formula):
+        buf = cStringIO()
+        printer = SmtPrinter(buf)
+        printer.printer(formula)
+        return buf.getvalue()
+    
     def _add_assertion(self, solver, formula, comment=None):
         if not self.config.skip_solving:
             solver.solver.add_assertion(formula)
 
         if Logger.level(3):
-            buf = cStringIO()
-            printer = SmtPrinter(buf)
-            printer.printer(formula)
-            print(buf.getvalue()+"\n")
+            print(self._formula_to_smt2(formula)+"\n")
 
         if solver.trace_file is not None:
             if comment:
@@ -247,15 +256,17 @@ class BMCSolver(object):
                 if v in solver.smt2vars:
                     continue
 
+                symbol_name = self._formula_to_smt2(v)
+
                 if v.symbol_type() == BOOL:
-                    self._write_smt2_log(solver, "(declare-fun %s () Bool)" % (v.symbol_name()))
+                    self._write_smt2_log(solver, "(declare-fun %s () Bool)" % (symbol_name))
                 elif v.symbol_type().is_array_type():
                     st = v.symbol_type()
                     assert st.index_type.is_bv_type(), "Expecting BV indices"
                     assert st.elem_type.is_bv_type(), "Expecting BV elements"
-                    self._write_smt2_log(solver, "(declare-fun %s () (Array (_ BitVec %s) (_ BitVec %s)))"%(v.symbol_name(), st.index_type.width, st.elem_type.width))
+                    self._write_smt2_log(solver, "(declare-fun %s () (Array (_ BitVec %s) (_ BitVec %s)))"%(symbol_name, st.index_type.width, st.elem_type.width))
                 elif v.symbol_type().is_bv_type():
-                    self._write_smt2_log(solver, "(declare-fun %s () (_ BitVec %s))" % (v.symbol_name(), v.symbol_type().width))
+                    self._write_smt2_log(solver, "(declare-fun %s () (_ BitVec %s))" % (symbol_name, v.symbol_type().width))
                 else:
                     Logger.error("Unhandled type in smt2 translation")
 
@@ -266,15 +277,9 @@ class BMCSolver(object):
 
             if formula.is_and():
                 for f in conjunctive_partition(formula):
-                    buf = cStringIO()
-                    printer = SmtPrinter(buf)
-                    printer.printer(f)
-                    self._write_smt2_log(solver, "(assert %s)"%buf.getvalue())
+                    self._write_smt2_log(solver, "(assert %s)"%self._formula_to_smt2(f))
             else:
-                buf = cStringIO()
-                printer = SmtPrinter(buf)
-                printer.printer(formula)
-                self._write_smt2_log(solver, "(assert %s)"%buf.getvalue())
+                self._write_smt2_log(solver, "(assert %s)"%self._formula_to_smt2(formula))
 
             if comment:
                 self._write_smt2_comment(solver, "%s: END"%comment)
@@ -413,11 +418,7 @@ class BMCSolver(object):
         for var in vars:
             for t in range(k+1):
                 if TS.get_ptimed(var, k-t) in model:
-                    val = model[TS.get_ptimed(var, k-t)]
-                else:
-                    val = FALSE() if var.symbol_type() == BOOL else BV(0, var.symbol_type().width)
-
-                retmodel[TS.get_timed(var, t)] = val
+                    retmodel[TS.get_timed(var, t)] = model[TS.get_ptimed(var, k-t)]
 
         return retmodel
 

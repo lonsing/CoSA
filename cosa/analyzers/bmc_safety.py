@@ -8,6 +8,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
 from multiprocessing import Process, Manager
 
 from pysmt.shortcuts import And, Or, Solver, TRUE, FALSE, Not, EqualsOrIff, Implies, Iff, Symbol, BOOL, simplify
@@ -128,15 +130,19 @@ class BMCSafety(BMCSolver):
 
         return None
 
-    def _check_mt_status(self, status):
-        if (status is not None) and (len(status) > 0):
-            return True
-        return False
-    
     def _run_as_process(self, function, name, ret, *args):
         if ret is None: ret = {}
         ret[name] = function(*args)
 
+    def _status_checker(self, status):
+
+        while True:
+            time.sleep(0.1)
+            if (status is not None) and (len(status.keys()) > 0):
+                (t, model) = [val for key,val in status.items() if val is not None][0]
+                if (model != None):
+                    return True
+        
     def solve_safety_inc(self, hts, prop, k, k_min):
         retdic = {}
         
@@ -147,20 +153,28 @@ class BMCSafety(BMCSolver):
                 ret = manager.dict({})
                 solvers.append(Process(target=self._run_as_process, \
                                        args=(self.solve_safety_inc_fwd, VerificationStrategy.FWD, ret, \
-                                             *[hts, prop, k, k_min, False, None, False, ret])))
+                                             *[hts, prop, k, k_min, False, None, False])))
                 solvers.append(Process(target=self._run_as_process, \
                                        args=(self.solve_safety_inc_bwd, VerificationStrategy.BWD, ret, \
-                                             *[hts, prop, k, False, ret])))
-
+                                             *[hts, prop, k, False])))
+                status_checker = Process(target=self._status_checker, args=[ret])
+                
                 if self.config.prove:
-                    solvers.append(Process(target=self._run_as_process, args=(self.solve_safety_inc_int, VerificationStrategy.INT, ret, *[hts, prop, k, ret])))
-                    solvers.append(Process(target=self._run_as_process, args=(self.solve_safety_inc_fwd, "K-IND", ret, *[hts, prop, k, k_min, False, None, True, ret])))
+                    solvers.append(Process(target=self._run_as_process, \
+                                           args=(self.solve_safety_inc_int, VerificationStrategy.INT, ret, \
+                                                 *[hts, prop, k])))
+                    solvers.append(Process(target=self._run_as_process, \
+                                           args=(self.solve_safety_inc_fwd, "FWD-K", ret, \
+                                                 *[hts, prop, k, k_min, False, None, True])))
                 
                 for solver in solvers:
                     solver.start()
 
+                status_checker.start()
+                status_checker.join()
+                
                 for solver in solvers:
-                    solver.join()
+                    solver.terminate()
 
                 for key,val in ret.items():
                     retdic[key] = val
@@ -220,6 +234,8 @@ class BMCSafety(BMCSolver):
         init = And(init, invar)
         nprop = Not(prop)
 
+        pivot = 2
+        
         t = 1 if has_next else 0
         while (t < k+1):
             Logger.log("\nSolving for k=%s"%t, 1)
@@ -228,8 +244,8 @@ class BMCSafety(BMCSolver):
             R = init_0
 
             trans_t = self.unroll(trans, invar, t, gen_list=True)
-            trans_tA = And(trans_t[0]) if t > 0 else TRUE()
-            trans_tB = And(trans_t[1:]) if t > 0 else TRUE()
+            trans_tA = And(trans_t[:pivot]) if t > 0 else TRUE()
+            trans_tB = And(trans_t[pivot:]) if t > 0 else TRUE()
 
             while True:
                 self._reset_assertions(self.solver)
@@ -257,7 +273,7 @@ class BMCSafety(BMCSolver):
                         Logger.msg(".", 0, not(Logger.level(1)))
                         break
 
-                    Ri = And(itp.sequence_interpolant([And(R, trans_tA), And(trans_tB, npropt)]))
+                    Ri = And(itp.binary_interpolant(And(R, trans_tA), And(trans_tB, npropt)))
                     Ri = substitute(Ri, map_10)
 
                     self._reset_assertions(self.solver)
@@ -276,7 +292,7 @@ class BMCSafety(BMCSolver):
 
         return (t-1, None)
 
-    def solve_safety_inc_int(self, hts, prop, k, mt_status=None):
+    def solve_safety_inc_int(self, hts, prop, k):
         init = hts.single_init()
         trans = hts.single_trans()
         invar = hts.single_invar()
@@ -296,8 +312,6 @@ class BMCSafety(BMCSolver):
             self._reset_assertions(solver_proof)
             self._add_assertion(solver_proof, And(Ri, Not(R)))
 
-            if self._check_mt_status(mt_status): return None
-            
             if not self._solve(solver_proof):
                 Logger.log("Proof found with k=%s"%(t), 1)
                 return TRUE()
@@ -308,22 +322,22 @@ class BMCSafety(BMCSolver):
         t = 1 if has_next else 0
 
         trans_t = self.unroll(trans, invar, k, gen_list=True)
-        trans_tAl = trans_t[:2]
-        trans_tA = And(trans_tAl)
+
+        pivot = 2
+        trans_tA = And(trans_t[:pivot])
+        init_0 = self.at_time(init, 0)
+
+        is_sat = True
+        Ri = None
 
         self._reset_assertions(solver)
         
         while (t < k+1):
             Logger.log("\nSolving for k=%s"%t, 1)
             int_c = 0
-            init_0 = self.at_time(init, 0)
             R = init_0
 
             # trans_t is composed as trans_i, invar_i, trans_i+1, invar_i+1, ...
-
-            trans_tBl = trans_t[1:(t*2)]
-            trans_tB = And(trans_tBl) if t > 0 else TRUE()
-
             self._add_assertion(solver, trans_t[2*t])
             self._add_assertion(solver, trans_t[(2*t)+1])
             
@@ -336,9 +350,14 @@ class BMCSafety(BMCSolver):
                 Logger.log("Add property time %d"%t, 2)
                 self._add_assertion(solver, npropt)
 
-                if self._check_mt_status(mt_status): return None
-                
-                if self._solve(solver):
+                Logger.log("Interpolation at k=%s"%(t), 2)
+
+                if t > 0:
+                    trans_tB = And(trans_t[pivot:(t*2)])
+                    Ri = And(itp.binary_interpolant(And(R, trans_tA), And(trans_tB, npropt)))
+                    is_sat = Ri == None
+
+                if is_sat and self._solve(solver):
                     if R == init_0:
                         Logger.log("Counterexample found with k=%s"%(t), 1)
                         model = self._get_model(solver)
@@ -349,21 +368,12 @@ class BMCSafety(BMCSolver):
                         self._pop(solver)
                         break
                 else:
-                    if t < 1:
-                        Logger.log("No counterexample found with k=%s"%(t), 1)
-                        Logger.msg(".", 0, not(Logger.level(1)))
-                        self._pop(solver)
+                    self._pop(solver)
+                    if Ri is None:
                         break
 
-                    Logger.log("Interpolation at k=%s"%(t), 2)
-                    if self._check_mt_status(mt_status): return None
-                    Ri = And(itp.binary_interpolant(And(R, trans_tA), And(trans_tB, npropt)))
                     Ri = substitute(Ri, map_10)
-
-                    self._pop(solver)
-                    
                     res = check_overappr(Ri, R)
-                    if self._check_mt_status(mt_status): return None
                     
                     if res == TRUE():
                         Logger.log("Proof found with k=%s"%(t), 1)
@@ -501,7 +511,7 @@ class BMCSafety(BMCSolver):
         return (hts, False)
 
     def solve_safety_inc_fwd(self, hts, prop, k, k_min, \
-                             all_vars=False, generalize=None, prove=None, mt_status=None):
+                             all_vars=False, generalize=None, prove=None):
 
         add_unsat_cons = False
         prove = self.config.prove if prove is None else prove
@@ -594,8 +604,6 @@ class BMCSafety(BMCSolver):
                         Logger.warning("Current solver does not support preferred variables")
                         self.preferred = None
 
-                if self._check_mt_status(mt_status): return None
-                
                 if self._solve(solver):
                     Logger.log("Counterexample found with k=%s"%(t), 1)
                     model = self._get_model(solver)
@@ -636,8 +644,6 @@ class BMCSafety(BMCSolver):
                     self._add_assertion(solver, acc_init)
                     self._add_assertion(solver, acc_loop_free)
 
-                    if self._check_mt_status(mt_status): return None
-
                     if self._solve(solver):
                         Logger.log("Induction (I & lF) failed with k=%s"%(t), 1)
                     else:
@@ -654,8 +660,6 @@ class BMCSafety(BMCSolver):
 
                     self._add_assertion(solver_ind, self.at_time(Not(prop), t_prop))
 
-                    if self._check_mt_status(mt_status): return None
-                
                     if self._solve(solver_ind):
                         Logger.log("Induction (lF & !P) failed with k=%s"%(t), 1)
                     else:
@@ -676,7 +680,7 @@ class BMCSafety(BMCSolver):
             
         return (t-1, None)
 
-    def solve_safety_inc_bwd(self, hts, prop, k, assert_property=False, mt_status=None):
+    def solve_safety_inc_bwd(self, hts, prop, k, assert_property=False):
         solver = self.solver.copy("inc_bwd")
 
         self._reset_assertions(solver)
@@ -700,8 +704,6 @@ class BMCSafety(BMCSolver):
             Logger.log("Add init at time %d"%t, 2)
             self._add_assertion(solver, pinit)
 
-            if self._check_mt_status(mt_status): return None
-            
             if self._solve(solver):
                 Logger.log("Counterexample found with k=%s"%(t), 1)
                 model = self._get_model(solver)
