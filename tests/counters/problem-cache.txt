@@ -2,6 +2,7 @@
 model_file: counters.json
 abstract_clock: True
 add_clock: True
+cache_files: True
 
 [DEFAULT]
 bmc_length: 20
