@@ -1,0 +1,57 @@
+INPUT
+'self.clk' : Bool;
+
+
+STATE
+'count0.r.reg0.out' : BV(16);
+'count1.r.reg0.out' : BV(16);
+
+VAR
+'count0.a.in0' : BV(16);
+'count0.a.in1' : BV(16);
+'count0.a.out' : BV(16);
+'count1.a.in0' : BV(16);
+'count1.a.in1' : BV(16);
+'count1.a.out' : BV(16);
+'count0.r.clrMux.in0' : BV(16);
+'count0.r.clrMux.in1' : BV(16);
+'count0.r.clrMux.out' : BV(16);
+'count0.r.clrMux.sel' : Bool;
+'count0.r.reg0.clk' : Bool;
+'count0.r.reg0.in' : BV(16);
+'count1.r.clrMux.in0' : BV(16);
+'count1.r.clrMux.in1' : BV(16);
+'count1.r.clrMux.out' : BV(16);
+'count1.r.clrMux.sel' : Bool;
+'count1.r.reg0.clk' : Bool;
+'count1.r.reg0.in' : BV(16);
+
+INIT
+('count1.r.reg0.out' = 0_16);
+('count0.r.reg0.out' = 0_16);
+
+INVAR
+(('count1.a.in0' + 'count1.a.in1') = 'count1.a.out');
+('count1.r.clrMux.out' = ((! 'count1.r.clrMux.sel') ? 'count1.r.clrMux.in0' : 'count1.r.clrMux.in1'));
+('count0.r.clrMux.out' = ((! 'count0.r.clrMux.sel') ? 'count0.r.clrMux.in0' : 'count0.r.clrMux.in1'));
+(('count0.a.in0' + 'count0.a.in1') = 'count0.a.out');
+(('count0.r.clrMux.sel' ? 1_1 : 0_1) = 'count1.r.reg0.out'[8:8]);
+('count0.r.clrMux.out' = 'count0.r.reg0.in');
+('count0.r.clrMux.in1' = 0_16);
+(('count1.r.clrMux.sel' ? 1_1 : 0_1) = 'count1.r.reg0.out'[4:4]);
+('count1.r.clrMux.out' = 'count1.r.reg0.in');
+('count1.r.clrMux.in1' = 0_16);
+('count1.a.out' = 'count1.r.clrMux.in0');
+('count1.a.in1' = 'count1.r.reg0.out');
+('count1.a.in0' = 1_16);
+('count0.a.in0' = 1_16);
+('count0.a.out' = 'count0.r.clrMux.in0');
+('count0.a.in1' = 'count0.r.reg0.out');
+('count1.r.reg0.clk' <-> 'self.clk');
+('count0.r.reg0.clk' <-> 'self.clk');
+
+TRANS
+(next('count1.r.reg0.out') = 'count1.r.reg0.in');
+(next('count0.r.reg0.out') = 'count0.r.reg0.in');
+
+FUNC

@@ -1,0 +1,121 @@
+INPUT
+'clk1' : BV(1);
+'clk2' : BV(1);
+'input' : BV(8);
+'rst' : BV(1);
+
+OUTPUT
+'out' : BV(8);
+'output' : BV(8);
+
+STATE
+'cell_0' : BV(8);
+'cell_1' : BV(8);
+'cell_2' : BV(8);
+'cell_3' : BV(8);
+'cell_4' : BV(8);
+'cell_5' : BV(8);
+'adder.cell_0' : BV(8);
+'adder.cell_1' : BV(8);
+'adder.cell_2' : BV(8);
+'adder.cell_3' : BV(8);
+'adder.cell_4' : BV(8);
+'adder.cell_5' : BV(8);
+'adder.out' : BV(8);
+'adder.output' : BV(8);
+'counter_1.cell_0' : BV(8);
+'counter_1.cell_1' : BV(8);
+'counter_1.cell_2' : BV(8);
+'counter_1.cell_3' : BV(8);
+'counter_1.cell_4' : BV(8);
+'counter_1.cell_5' : BV(8);
+'counter_1.out' : BV(8);
+'counter_1.output' : BV(8);
+'counter_2.cell_0' : BV(8);
+'counter_2.cell_1' : BV(8);
+'counter_2.cell_2' : BV(8);
+'counter_2.cell_3' : BV(8);
+'counter_2.cell_4' : BV(8);
+'counter_2.cell_5' : BV(8);
+'counter_2.out' : BV(8);
+'counter_2.output' : BV(8);
+'fifo_1.cell_0' : BV(8);
+'fifo_1.cell_1' : BV(8);
+'fifo_1.cell_2' : BV(8);
+'fifo_1.cell_3' : BV(8);
+'fifo_1.cell_4' : BV(8);
+'fifo_1.cell_5' : BV(8);
+'adder.fifo_1.cell_0' : BV(8);
+'adder.fifo_1.cell_1' : BV(8);
+'adder.fifo_1.cell_2' : BV(8);
+'adder.fifo_1.cell_3' : BV(8);
+'adder.fifo_1.cell_4' : BV(8);
+'adder.fifo_1.cell_5' : BV(8);
+'counter_1.fifo_1.cell_0' : BV(8);
+'counter_1.fifo_1.cell_1' : BV(8);
+'counter_1.fifo_1.cell_2' : BV(8);
+'counter_1.fifo_1.cell_3' : BV(8);
+'counter_1.fifo_1.cell_4' : BV(8);
+'counter_1.fifo_1.cell_5' : BV(8);
+'counter_2.fifo_1.cell_0' : BV(8);
+'counter_2.fifo_1.cell_1' : BV(8);
+'counter_2.fifo_1.cell_2' : BV(8);
+'counter_2.fifo_1.cell_3' : BV(8);
+'counter_2.fifo_1.cell_4' : BV(8);
+'counter_2.fifo_1.cell_5' : BV(8);
+
+VAR
+'init1' : BV(8);
+'init2' : BV(8);
+'adder.clk1' : BV(1);
+'adder.clk2' : BV(1);
+'adder.in1' : BV(8);
+'adder.in2' : BV(8);
+'adder.input' : BV(8);
+'adder.rst' : BV(1);
+'counter_1.clk' : BV(1);
+'counter_1.clk1' : BV(1);
+'counter_1.clk2' : BV(1);
+'counter_1.initval' : BV(8);
+'counter_1.input' : BV(8);
+'counter_1.rst' : BV(1);
+'counter_2.clk' : BV(1);
+'counter_2.clk1' : BV(1);
+'counter_2.clk2' : BV(1);
+'counter_2.initval' : BV(8);
+'counter_2.input' : BV(8);
+'counter_2.rst' : BV(1);
+
+INIT
+('clk2' = 1_1);
+('clk1' = 0_1);
+('counter_1.out' = 0_8);
+('counter_2.out' = 0_8);
+
+INVAR
+('init2' = 2_8);
+('init1' = 0_8);
+('out' = 'adder.out');
+('adder.out' = ('adder.in1' + 'adder.in2'));
+
+TRANS
+(('out' <= 10_8) -> ('rst' = 0_1));
+((10_8 < 'out') -> (('rst' = 0_1) & (next('rst') = 1_1)));
+(('clk2' = 0_1) <-> (next('clk2') = 1_1));
+(('clk1' = 0_1) <-> (next('clk1') = 1_1));
+((('counter_1.rst' = 0_1) & (next('counter_1.rst') = 1_1)) -> (next('counter_1.out') = 'counter_1.initval'));
+(((('counter_1.clk' = 1_1) & (next('counter_1.clk') = 0_1)) & (! ((next('counter_1.rst') = 1_1) & ('counter_1.rst' = 0_1)))) -> (next('counter_1.out') = 'counter_1.out'));
+(((('counter_1.clk' = 0_1) & (next('counter_1.clk') = 1_1)) & (! ((next('counter_1.rst') = 1_1) & ('counter_1.rst' = 0_1)))) -> (next('counter_1.out') = ('counter_1.out' + 1_8)));
+((('counter_2.rst' = 0_1) & (next('counter_2.rst') = 1_1)) -> (next('counter_2.out') = 'counter_2.initval'));
+(((('counter_2.clk' = 1_1) & (next('counter_2.clk') = 0_1)) & (! ((next('counter_2.rst') = 1_1) & ('counter_2.rst' = 0_1)))) -> (next('counter_2.out') = 'counter_2.out'));
+(((('counter_2.clk' = 0_1) & (next('counter_2.clk') = 1_1)) & (! ((next('counter_2.rst') = 1_1) & ('counter_2.rst' = 0_1)))) -> (next('counter_2.out') = ('counter_2.out' + 1_8)));
+
+FUNC
+'counter_2.clk' := {True, 'clk2'};
+'counter_2.rst' := {True, 'rst'};
+'counter_2.initval' := {True, 'init2'};
+'adder.in1' := {True, 'counter_1.out'};
+'adder.in2' := {True, 'counter_2.out'};
+'counter_1.clk' := {True, 'clk1'};
+'counter_1.rst' := {True, 'rst'};
+'counter_1.initval' := {True, 'init1'};

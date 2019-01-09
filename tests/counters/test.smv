@@ -1,0 +1,55 @@
+MODULE main
+
+VAR
+"count0.a.in0" : word[16];
+"count0.a.in1" : word[16];
+"count0.a.out" : word[16];
+"count0.r.clrMux.in0" : word[16];
+"count0.r.clrMux.in1" : word[16];
+"count0.r.clrMux.out" : word[16];
+"count0.r.clrMux.sel" : word[1];
+"count0.r.reg0.out" : word[16];
+"count0.r.reg0.clk" : word[1];
+"count0.r.reg0.in" : word[16];
+"count1.a.in0" : word[16];
+"count1.a.in1" : word[16];
+"count1.a.out" : word[16];
+"count1.r.clrMux.in0" : word[16];
+"count1.r.clrMux.in1" : word[16];
+"count1.r.clrMux.out" : word[16];
+"count1.r.clrMux.sel" : word[1];
+"count1.r.reg0.out" : word[16];
+"count1.r.reg0.clk" : word[1];
+"count1.r.reg0.in" : word[16];
+"self.clk" : word[1];
+
+INIT
+("count1.r.reg0.out" = 0ud16_0) &
+TRUE &
+("count0.r.reg0.out" = 0ud16_0);
+
+INVAR
+TRUE &
+("count1.r.clrMux.out" = (("count1.r.clrMux.sel" = 0ud1_0) ? "count1.r.clrMux.in0" : "count1.r.clrMux.in1")) &
+(("count0.a.in0" + "count0.a.in1") = "count0.a.out") &
+("count1.r.reg0.clk" = "self.clk") &
+("count1.r.clrMux.sel" = "count1.r.reg0.out"[4:4]) &
+("count1.r.clrMux.out" = "count1.r.reg0.in") &
+("count1.r.clrMux.in1" = 0ud16_0) &
+("count1.a.out" = "count1.r.clrMux.in0") &
+("count1.a.in1" = "count1.r.reg0.out") &
+("count1.a.in0" = 0ud16_1) &
+("count0.r.reg0.clk" = "self.clk") &
+("count0.r.clrMux.sel" = "count1.r.reg0.out"[8:8]) &
+("count0.r.clrMux.out" = "count0.r.reg0.in") &
+("count0.r.clrMux.in1" = 0ud16_0) &
+("count0.a.out" = "count0.r.clrMux.in0") &
+("count0.a.in1" = "count0.r.reg0.out") &
+("count0.a.in0" = 0ud16_1) &
+("count0.r.clrMux.out" = (("count0.r.clrMux.sel" = 0ud1_0) ? "count0.r.clrMux.in0" : "count0.r.clrMux.in1")) &
+(("count1.a.in0" + "count1.a.in1") = "count1.a.out");
+
+TRANS
+TRUE &
+(next("count1.r.reg0.out") = (((next("count1.r.reg0.clk") = 0ud1_1) & ("count1.r.reg0.clk" = 0ud1_0)) ? "count1.r.reg0.in" : "count1.r.reg0.out")) &
+(next("count0.r.reg0.out") = ((("count0.r.reg0.clk" = 0ud1_0) & (next("count0.r.reg0.clk") = 0ud1_1)) ? "count0.r.reg0.in" : "count0.r.reg0.out"));

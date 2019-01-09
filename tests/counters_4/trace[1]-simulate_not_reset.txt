@@ -1,0 +1,75 @@
+---> INIT <---
+  I: clk = 0_1
+  I: out = 0_16
+  I: rst = 0_1
+
+---> STATE 1 <---
+  S1: clk = 1_1
+  S1: rst = 1_1
+
+---> STATE 2 <---
+  S2: clk = 0_1
+  S2: rst = 0_1
+
+---> STATE 3 <---
+  S3: clk = 1_1
+  S3: out = 1_16
+
+---> STATE 4 <---
+  S4: clk = 0_1
+
+---> STATE 5 <---
+  S5: clk = 1_1
+  S5: out = 2_16
+
+---> STATE 6 <---
+  S6: clk = 0_1
+
+---> STATE 7 <---
+  S7: clk = 1_1
+  S7: out = 3_16
+
+---> STATE 8 <---
+  S8: clk = 0_1
+
+---> STATE 9 <---
+  S9: clk = 1_1
+  S9: out = 4_16
+
+---> STATE 10 <---
+  S10: clk = 0_1
+
+---> STATE 11 <---
+  S11: clk = 1_1
+  S11: out = 5_16
+
+---> STATE 12 <---
+  S12: clk = 0_1
+
+---> STATE 13 <---
+  S13: clk = 1_1
+  S13: out = 6_16
+
+---> STATE 14 <---
+  S14: clk = 0_1
+
+---> STATE 15 <---
+  S15: clk = 1_1
+  S15: out = 7_16
+
+---> STATE 16 <---
+  S16: clk = 0_1
+
+---> STATE 17 <---
+  S17: clk = 1_1
+  S17: out = 8_16
+
+---> STATE 18 <---
+  S18: clk = 0_1
+
+---> STATE 19 <---
+  S19: clk = 1_1
+  S19: out = 9_16
+
+---> STATE 20 <---
+  S20: clk = 0_1

@@ -1,0 +1,13 @@
+
+
+
+
+INIT
+('clk1' = 1_1);
+
+INVAR
+
+TRANS
+(next('clk1') = (! 'clk1'));
+
+FUNC

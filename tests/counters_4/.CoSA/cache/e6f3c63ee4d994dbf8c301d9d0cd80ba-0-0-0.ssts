@@ -1,0 +1,27 @@
+
+
+STATE
+'H__state_id3__H' : BV(2);
+'reset_done' : Bool;
+'reset_performed' : Bool;
+'rst' : BV(1);
+
+
+INIT
+('H__state_id3__H' = 0_2);
+('rst' = 0_1);
+('reset_performed' <-> False);
+('reset_done' <-> False);
+
+INVAR
+('H__state_id3__H' <= 2_2);
+(('H__state_id3__H' = 2_2) -> (True & ('reset_performed' <-> True)));
+(('H__state_id3__H' = 1_2) -> (((True & ('rst' = 1_1)) & ('reset_done' <-> True)) & ('reset_performed' <-> False)));
+(('H__state_id3__H' = 0_2) -> (((True & ('rst' = 0_1)) & ('reset_done' <-> False)) & ('reset_performed' <-> False)));
+
+TRANS
+(('H__state_id3__H' = 2_2) -> (next('H__state_id3__H') = 2_2));
+(('H__state_id3__H' = 1_2) -> (next('H__state_id3__H') = 2_2));
+(('H__state_id3__H' = 0_2) -> (next('H__state_id3__H') = 1_2));
+
+FUNC

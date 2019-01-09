@@ -1,0 +1,40 @@
+INPUT
+'self.clk' : Bool;
+'self.clr' : Bool;
+
+OUTPUT
+'self.out' : BV(16);
+
+STATE
+'r.reg0.out' : BV(16);
+
+VAR
+'a.in0' : BV(16);
+'a.in1' : BV(16);
+'a.out' : BV(16);
+'r.clrMux.in0' : BV(16);
+'r.clrMux.in1' : BV(16);
+'r.clrMux.out' : BV(16);
+'r.clrMux.sel' : Bool;
+'r.reg0.clk' : Bool;
+'r.reg0.in' : BV(16);
+
+INIT
+('r.reg0.out' = 0_16);
+
+INVAR
+('r.clrMux.out' = ((! 'r.clrMux.sel') ? 'r.clrMux.in0' : 'r.clrMux.in1'));
+('r.clrMux.out' = 'r.reg0.in');
+('r.clrMux.in1' = 0_16);
+('a.out' = 'r.clrMux.in0');
+('r.reg0.out' = 'self.out');
+('a.in0' = 1_16);
+('a.in1' = 'r.reg0.out');
+(('a.in0' + 'a.in1') = 'a.out');
+('r.reg0.clk' <-> 'self.clk');
+('r.clrMux.sel' <-> 'self.clr');
+
+TRANS
+(next('r.reg0.out') = (((! 'r.reg0.clk') & next('r.reg0.clk')) ? 'r.reg0.in' : 'r.reg0.out'));
+
+FUNC

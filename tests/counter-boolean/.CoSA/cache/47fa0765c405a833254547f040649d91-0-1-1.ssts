@@ -1,0 +1,25 @@
+
+
+STATE
+'H__state_id6__H' : BV(2);
+'en_clr' : Bool;
+
+
+INIT
+('H__state_id6__H' = 0_2);
+('en_clr' <-> False);
+
+INVAR
+('H__state_id6__H' <= 3_2);
+(('H__state_id6__H' = 3_2) -> (True & True));
+(('H__state_id6__H' = 2_2) -> (True & ('en_clr' <-> False)));
+(('H__state_id6__H' = 1_2) -> (True & ('en_clr' <-> False)));
+(('H__state_id6__H' = 0_2) -> (True & ('en_clr' <-> False)));
+
+TRANS
+(('H__state_id6__H' = 3_2) -> (next('H__state_id6__H') = 3_2));
+(('H__state_id6__H' = 2_2) -> ((next('H__state_id6__H') = 2_2) | (next('H__state_id6__H') = 3_2)));
+(('H__state_id6__H' = 1_2) -> (next('H__state_id6__H') = 2_2));
+(('H__state_id6__H' = 0_2) -> (next('H__state_id6__H') = 1_2));
+
+FUNC

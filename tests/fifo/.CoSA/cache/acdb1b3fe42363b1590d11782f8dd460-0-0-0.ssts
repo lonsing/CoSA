@@ -1,0 +1,49 @@
+INPUT
+'input' : BV(8);
+
+OUTPUT
+'output' : BV(8);
+
+STATE
+'cell_0' : BV(8);
+'cell_1' : BV(8);
+'cell_2' : BV(8);
+'cell_3' : BV(8);
+'cell_4' : BV(8);
+'cell_5' : BV(8);
+'fifo_1.cell_0' : BV(8);
+'fifo_1.cell_1' : BV(8);
+'fifo_1.cell_2' : BV(8);
+'fifo_1.cell_3' : BV(8);
+'fifo_1.cell_4' : BV(8);
+'fifo_1.cell_5' : BV(8);
+'fifo_1.output' : BV(8);
+'fifo_1.fifo_1.cell_0' : BV(8);
+'fifo_1.fifo_1.cell_1' : BV(8);
+'fifo_1.fifo_1.cell_2' : BV(8);
+'fifo_1.fifo_1.cell_3' : BV(8);
+'fifo_1.fifo_1.cell_4' : BV(8);
+'fifo_1.fifo_1.cell_5' : BV(8);
+
+VAR
+'clk' : BV(1);
+'fifo_1.clk' : BV(1);
+'fifo_1.in' : BV(8);
+'fifo_1.input' : BV(8);
+'fifo_1.out' : BV(8);
+
+INIT
+('clk' = 0_1);
+
+INVAR
+('fifo_1.out' = 'fifo_1.cell_5');
+
+TRANS
+((! (('fifo_1.clk' = 0_1) & (next('fifo_1.clk') = 1_1))) -> (((((('fifo_1.cell_0' = next('fifo_1.cell_0')) & ('fifo_1.cell_1' = next('fifo_1.cell_1'))) & ('fifo_1.cell_2' = next('fifo_1.cell_2'))) & ('fifo_1.cell_3' = next('fifo_1.cell_3'))) & ('fifo_1.cell_4' = next('fifo_1.cell_4'))) & ('fifo_1.cell_5' = next('fifo_1.cell_5'))));
+((('fifo_1.clk' = 0_1) & (next('fifo_1.clk') = 1_1)) -> ((((((next('fifo_1.cell_0') = 'fifo_1.in') & (next('fifo_1.cell_1') = 'fifo_1.cell_0')) & (next('fifo_1.cell_2') = 'fifo_1.cell_1')) & (next('fifo_1.cell_3') = 'fifo_1.cell_2')) & (next('fifo_1.cell_4') = 'fifo_1.cell_3')) & (next('fifo_1.cell_5') = 'fifo_1.cell_4')));
+(('clk' = 0_1) <-> (next('clk') = 1_1));
+
+FUNC
+'fifo_1.in' := {True, 'input'};
+'fifo_1.out' := {True, 'output'};
+'fifo_1.clk' := {True, 'clk'};

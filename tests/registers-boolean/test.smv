@@ -1,0 +1,72 @@
+MODULE main
+
+VAR
+"reg0.out" : word[16];
+"reg0.clk" : boolean;
+"reg0.arst" : boolean;
+"reg0.in" : word[16];
+"rstwrap.out" : boolean;
+"rstwrap.in" : boolean;
+"self.arst" : boolean;
+"self.clk" : boolean;
+"self.in" : word[16];
+"self.out0" : word[16];
+"self.out1" : word[16];
+"self.out2" : word[16];
+"self.out3" : word[16];
+"self.out4" : word[16];
+"reg1.out" : word[16];
+"reg1.clk" : boolean;
+"reg1.arst" : boolean;
+"reg1.in" : word[16];
+"reg2.out" : word[16];
+"reg2.clk" : boolean;
+"reg2.arst" : boolean;
+"reg2.in" : word[16];
+"reg3.out" : word[16];
+"reg3.clk" : boolean;
+"reg3.arst" : boolean;
+"reg3.in" : word[16];
+"reg4.out" : word[16];
+"reg4.clk" : boolean;
+"reg4.in" : word[16];
+
+INIT
+("reg2.out" = 0ud16_0) &
+TRUE &
+("reg3.out" = 0ud16_0) &
+("reg0.out" = 0ud16_0) &
+("reg1.out" = 0ud16_0) &
+("reg4.out" = 0ud16_0);
+
+INVAR
+TRUE &
+("rstwrap.in" <-> "self.arst") &
+("reg4.out" = "self.out4") &
+("reg4.in" = "self.in") &
+("reg4.clk" <-> "self.clk") &
+("reg3.out" = "self.out3") &
+("reg3.in" = "self.in") &
+("reg3.clk" <-> "self.clk") &
+("reg3.arst" <-> "rstwrap.out") &
+("reg2.out" = "self.out2") &
+("reg2.in" = "self.in") &
+("reg2.clk" <-> "self.clk") &
+("reg2.arst" <-> "rstwrap.out") &
+("reg1.out" = "self.out1") &
+("reg1.in" = "self.in") &
+("reg1.clk" <-> "self.clk") &
+("reg1.arst" <-> "rstwrap.out") &
+("reg0.out" = "self.out0") &
+("reg0.in" = "self.in") &
+("reg0.clk" <-> "self.clk") &
+("reg0.arst" <-> "rstwrap.out") &
+("rstwrap.in" <-> "rstwrap.out");
+
+TRANS
+TRUE &
+(next("reg2.out") = (((! next("reg2.clk")) & "reg2.clk") ? "reg2.in" : "reg2.out")) &
+(next("reg3.out") = (("reg3.clk" & (! next("reg3.clk"))) ? "reg3.in" : "reg3.out")) &
+(next("reg0.out") = (((! "reg0.clk") & next("reg0.clk")) ? "reg0.in" : "reg0.out")) &
+(next("reg1.out") = ((next("reg1.clk") & (! "reg1.clk")) ? "reg1.in" : "reg1.out")) &
+(next("reg4.out") = (((! "reg4.clk") & next("reg4.clk")) ? "reg4.in" : "reg4.out"));

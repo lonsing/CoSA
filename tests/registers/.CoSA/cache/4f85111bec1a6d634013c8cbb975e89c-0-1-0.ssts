@@ -1,0 +1,75 @@
+INPUT
+'self.arst' : BV(1);
+'self.clk' : BV(1);
+'self.in' : BV(16);
+
+OUTPUT
+'self.out0' : BV(16);
+'self.out1' : BV(16);
+'self.out2' : BV(16);
+'self.out3' : BV(16);
+'self.out4' : BV(16);
+
+STATE
+'reg0.out' : BV(16);
+'reg1.out' : BV(16);
+'reg2.out' : BV(16);
+'reg3.out' : BV(16);
+'reg4.out' : BV(16);
+
+VAR
+'reg0.arst' : BV(1);
+'reg0.clk' : BV(1);
+'reg0.in' : BV(16);
+'reg1.arst' : BV(1);
+'reg1.clk' : BV(1);
+'reg1.in' : BV(16);
+'reg2.arst' : BV(1);
+'reg2.clk' : BV(1);
+'reg2.in' : BV(16);
+'reg3.arst' : BV(1);
+'reg3.clk' : BV(1);
+'reg3.in' : BV(16);
+'reg4.clk' : BV(1);
+'reg4.in' : BV(16);
+'rstwrap.in' : BV(1);
+'rstwrap.out' : BV(1);
+
+INIT
+('reg3.out' = 0_16);
+('reg0.out' = 0_16);
+('reg1.out' = 0_16);
+('reg4.out' = 0_16);
+('reg2.out' = 0_16);
+
+INVAR
+('rstwrap.in' = 'rstwrap.out');
+('reg1.clk' = 'self.clk');
+('reg2.clk' = 'self.clk');
+('reg1.out' = 'self.out1');
+('reg3.clk' = 'self.clk');
+('reg2.out' = 'self.out2');
+('reg4.clk' = 'self.clk');
+('reg3.out' = 'self.out3');
+('reg4.out' = 'self.out4');
+('reg0.out' = 'self.out0');
+('reg1.in' = 'self.in');
+('reg3.in' = 'self.in');
+('reg4.in' = 'self.in');
+('reg2.in' = 'self.in');
+('reg0.in' = 'self.in');
+('reg1.arst' = 'rstwrap.out');
+('reg0.arst' = 'rstwrap.out');
+('reg3.arst' = 'rstwrap.out');
+('reg2.arst' = 'rstwrap.out');
+('reg0.clk' = 'self.clk');
+('rstwrap.in' = 'self.arst');
+
+TRANS
+(next('reg3.out') = (((next('reg3.clk') = 0_1) & ('reg3.clk' = 1_1)) ? 'reg3.in' : 'reg3.out'));
+(next('reg0.out') = (((next('reg0.clk') = 1_1) & ('reg0.clk' = 0_1)) ? 'reg0.in' : 'reg0.out'));
+(next('reg1.out') = (((next('reg1.clk') = 1_1) & ('reg1.clk' = 0_1)) ? 'reg1.in' : 'reg1.out'));
+(next('reg4.out') = ((('reg4.clk' = 0_1) & (next('reg4.clk') = 1_1)) ? 'reg4.in' : 'reg4.out'));
+(next('reg2.out') = (((next('reg2.clk') = 0_1) & ('reg2.clk' = 1_1)) ? 'reg2.in' : 'reg2.out'));
+
+FUNC

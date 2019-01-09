@@ -1,0 +1,37 @@
+INPUT
+'clk1' : BV(1);
+'clk2' : BV(1);
+'input' : BV(8);
+'rst' : BV(1);
+
+OUTPUT
+'out' : BV(8);
+'output' : BV(8);
+
+STATE
+'cell_0' : BV(8);
+'cell_1' : BV(8);
+'cell_2' : BV(8);
+'cell_3' : BV(8);
+'cell_4' : BV(8);
+'cell_5' : BV(8);
+'fifo_1.cell_0' : BV(8);
+'fifo_1.cell_1' : BV(8);
+'fifo_1.cell_2' : BV(8);
+'fifo_1.cell_3' : BV(8);
+'fifo_1.cell_4' : BV(8);
+'fifo_1.cell_5' : BV(8);
+
+VAR
+'en_clr' : Bool;
+
+INIT
+(! 'en_clr');
+
+INVAR
+
+TRANS
+((! 'en_clr') -> ((5_16 < 'self.out') <-> next('en_clr')));
+('en_clr' -> next('en_clr'));
+
+FUNC

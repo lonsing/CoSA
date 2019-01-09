@@ -1,0 +1,72 @@
+MODULE main
+
+VAR
+"counter_1.rst" : word[1];
+"out" : word[8];
+"val1" : word[8];
+"val2" : word[8];
+"init1" : word[8];
+"init2" : word[8];
+"counter_1.clk" : word[1];
+"counter_1.initval" : word[8];
+"clk1" : word[1];
+"rst1" : word[1];
+"rst2" : word[1];
+"reset1.rst" : word[1];
+"reset1.in" : word[8];
+"reset1.clk" : word[1];
+"adder.in1" : word[8];
+"adder.in2" : word[8];
+"adder.out" : word[8];
+"reset2.rst" : word[1];
+"reset2.in" : word[8];
+"reset2.clk" : word[1];
+"clk2" : word[1];
+"counter_2.out" : word[8];
+"counter_2.rst" : word[1];
+"counter_2.clk" : word[1];
+"counter_2.initval" : word[8];
+"counter_1.out" : word[8];
+
+INIT
+TRUE &
+("counter_2.out" = 0ud8_0) &
+("counter_1.out" = 0ud8_0);
+
+INVAR
+TRUE &
+("adder.out" = ("adder.in1" + "adder.in2")) &
+("out" = "adder.out") &
+("adder.in2" = "val2") &
+("adder.in1" = "val1") &
+("counter_2.rst" = ("rst1" | "rst2")) &
+("val2" = "counter_2.out") &
+("counter_2.initval" = "init2") &
+("counter_2.clk" = "clk2") &
+("init2" = 0ud8_1) &
+("init1" = 0ud8_0) &
+("counter_1.rst" = ("rst1" | "rst2")) &
+("val1" = "counter_1.out") &
+("counter_1.initval" = "init1") &
+("counter_1.clk" = "clk1") &
+("rst1" = "reset1.rst") &
+("reset1.in" = "out") &
+("reset1.clk" = "clk1") &
+("rst2" = "reset2.rst") &
+("reset2.in" = "out") &
+("reset2.clk" = "clk2");
+
+TRANS
+TRUE &
+(((! (("reset2.clk" = 0ud1_0) & (next("reset2.clk") = 0ud1_1) & (0ud8_8 < "reset2.in"))) & (! (("reset2.clk" = 0ud1_0) & (next("reset2.clk") = 0ud1_1) & (! (0ud8_8 < "reset2.in"))))) -> (next("reset2.rst") = "reset2.rst")) &
+((("reset2.clk" = 0ud1_0) & (next("reset2.clk") = 0ud1_1) & (! (0ud8_8 < "reset2.in"))) -> (next("reset2.rst") = 0ud1_0)) &
+((("reset2.clk" = 0ud1_0) & (next("reset2.clk") = 0ud1_1) & (0ud8_8 < "reset2.in")) -> (next("reset2.rst") = 0ud1_1)) &
+(((! ((! (next("counter_2.rst") = 0ud1_1)) & ((("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1)) | (("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1))))) & (! (((("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1)) | (("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1))) & (next("counter_2.rst") = 0ud1_1)))) -> (next("counter_2.out") = "counter_2.out")) &
+(((! (next("counter_2.rst") = 0ud1_1)) & ((("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1)) | (("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1)))) -> (next("counter_2.out") = (extend ( "counter_2.out", 24) + 0ud32_1)[7:0])) &
+((((("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1)) | (("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1))) & (next("counter_2.rst") = 0ud1_1)) -> (next("counter_2.out") = "counter_2.initval")) &
+(((! ((! (0ud8_8 < "reset1.in")) & ("reset1.clk" = 0ud1_0) & (next("reset1.clk") = 0ud1_1))) & (! (("reset1.clk" = 0ud1_0) & (next("reset1.clk") = 0ud1_1) & (0ud8_8 < "reset1.in")))) -> (next("reset1.rst") = "reset1.rst")) &
+(((! (0ud8_8 < "reset1.in")) & ("reset1.clk" = 0ud1_0) & (next("reset1.clk") = 0ud1_1)) -> (next("reset1.rst") = 0ud1_0)) &
+((("reset1.clk" = 0ud1_0) & (next("reset1.clk") = 0ud1_1) & (0ud8_8 < "reset1.in")) -> (next("reset1.rst") = 0ud1_1)) &
+(((! (((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | ((next("counter_1.clk") = 0ud1_1) & ("counter_1.clk" = 0ud1_0))) & (! (next("counter_1.rst") = 0ud1_1)))) & (! (((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | ((next("counter_1.clk") = 0ud1_1) & ("counter_1.clk" = 0ud1_0))) & (next("counter_1.rst") = 0ud1_1)))) -> (next("counter_1.out") = "counter_1.out")) &
+((((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | ((next("counter_1.clk") = 0ud1_1) & ("counter_1.clk" = 0ud1_0))) & (! (next("counter_1.rst") = 0ud1_1))) -> (next("counter_1.out") = (extend ( "counter_1.out", 24) + 0ud32_1)[7:0])) &
+((((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | ((next("counter_1.clk") = 0ud1_1) & ("counter_1.clk" = 0ud1_0))) & (next("counter_1.rst") = 0ud1_1)) -> (next("counter_1.out") = "counter_1.initval"));

@@ -1,0 +1,112 @@
+INPUT
+'clk' : BV(1);
+'rst' : BV(1);
+
+OUTPUT
+'out' : BV(16);
+
+STATE
+'autoclk2fflogic.cc_c_222_c_execute24' : BV(1);
+'autoclk2fflogic.cc_c_222_c_execute35' : BV(1);
+'autoclk2fflogic.cc_c_222_c_execute46' : BV(1);
+'autoclk2fflogic.cc_c_222_c_execute57' : BV(1);
+'autoclk2fflogic.cc_c_222_c_execute68' : BV(1);
+'autoclk2fflogic.cc_c_245_c_execute28' : BV(8);
+'autoclk2fflogic.cc_c_245_c_execute39' : BV(4);
+'autoclk2fflogic.cc_c_245_c_execute50' : BV(4);
+'autoclk2fflogic.cc_c_245_c_execute61' : BV(2);
+'autoclk2fflogic.cc_c_245_c_execute72' : BV(2);
+'autoclk2fflogic.cc_c_246_c_execute29' : BV(8);
+'autoclk2fflogic.cc_c_246_c_execute40' : BV(4);
+'autoclk2fflogic.cc_c_246_c_execute51' : BV(4);
+'autoclk2fflogic.cc_c_246_c_execute62' : BV(2);
+'autoclk2fflogic.cc_c_246_c_execute73' : BV(2);
+
+VAR
+'clk1' : BV(1);
+'clk2' : BV(1);
+'clk3' : BV(1);
+'clk4' : BV(1);
+'sel' : BV(2);
+'val1' : BV(8);
+'val2' : BV(4);
+'val3' : BV(4);
+'val4' : BV(2);
+'adder.in1' : BV(8);
+'adder.in2' : BV(4);
+'adder.in3' : BV(4);
+'adder.in4' : BV(2);
+'adder.out' : BV(16);
+'counter_1.clk' : BV(1);
+'counter_1.out' : BV(8);
+'counter_1.rst' : BV(1);
+'counter_2.clk' : BV(1);
+'counter_2.out' : BV(4);
+'counter_2.rst' : BV(1);
+'counter_3.clk' : BV(1);
+'counter_3.out' : BV(4);
+'counter_3.rst' : BV(1);
+'counter_4.clk' : BV(1);
+'counter_4.out' : BV(2);
+'counter_4.rst' : BV(1);
+'counter_clk.clk' : BV(1);
+'counter_clk.out' : BV(2);
+'counter_clk.rst' : BV(1);
+
+INIT
+('autoclk2fflogic.cc_c_222_c_execute57' = 1_1);
+('autoclk2fflogic.cc_c_222_c_execute46' = 1_1);
+('autoclk2fflogic.cc_c_222_c_execute68' = 1_1);
+('autoclk2fflogic.cc_c_222_c_execute24' = 1_1);
+('autoclk2fflogic.cc_c_222_c_execute35' = 1_1);
+
+INVAR
+('counter_4.out' = ((('rst' = 1_1) ? 0_2 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2)::'autoclk2fflogic.cc_c_222_c_execute57') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute61' : 'autoclk2fflogic.cc_c_246_c_execute62')) ZEXT 0));
+('counter_4.clk' = (((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2) ZEXT 0));
+('counter_3.rst' = ('rst' ZEXT 0));
+('counter_3.clk' = (((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2) ZEXT 0));
+('counter_2.rst' = ('rst' ZEXT 0));
+('out' = (0_5::(((((((('rst' = 1_1) ? 0_8 : (((((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2)))::'autoclk2fflogic.cc_c_222_c_execute24') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute28' : 'autoclk2fflogic.cc_c_246_c_execute29')) ZEXT 1) + ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2)::'autoclk2fflogic.cc_c_222_c_execute35') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute39' : 'autoclk2fflogic.cc_c_246_c_execute40')) ZEXT 5)) ZEXT 1) + ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2)::'autoclk2fflogic.cc_c_222_c_execute46') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute50' : 'autoclk2fflogic.cc_c_246_c_execute51')) ZEXT 6)) ZEXT 1) + ((('rst' = 1_1) ? 0_2 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2)::'autoclk2fflogic.cc_c_222_c_execute57') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute61' : 'autoclk2fflogic.cc_c_246_c_execute62')) ZEXT 9))));
+('adder.in2' = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2)::'autoclk2fflogic.cc_c_222_c_execute35') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute39' : 'autoclk2fflogic.cc_c_246_c_execute40')) ZEXT 0));
+('adder.out' = ((0_5::(((((((('rst' = 1_1) ? 0_8 : (((((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2)))::'autoclk2fflogic.cc_c_222_c_execute24') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute28' : 'autoclk2fflogic.cc_c_246_c_execute29')) ZEXT 1) + ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2)::'autoclk2fflogic.cc_c_222_c_execute35') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute39' : 'autoclk2fflogic.cc_c_246_c_execute40')) ZEXT 5)) ZEXT 1) + ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2)::'autoclk2fflogic.cc_c_222_c_execute46') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute50' : 'autoclk2fflogic.cc_c_246_c_execute51')) ZEXT 6)) ZEXT 1) + ((('rst' = 1_1) ? 0_2 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2)::'autoclk2fflogic.cc_c_222_c_execute57') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute61' : 'autoclk2fflogic.cc_c_246_c_execute62')) ZEXT 9))) ZEXT 0));
+('counter_1.rst' = ('rst' ZEXT 0));
+('val2' = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2)::'autoclk2fflogic.cc_c_222_c_execute35') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute39' : 'autoclk2fflogic.cc_c_246_c_execute40')) ZEXT 0));
+('counter_1.out' = ((('rst' = 1_1) ? 0_8 : (((((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2)))::'autoclk2fflogic.cc_c_222_c_execute24') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute28' : 'autoclk2fflogic.cc_c_246_c_execute29')) ZEXT 0));
+('clk2' = (((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2) ZEXT 0));
+('counter_2.clk' = (((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2) ZEXT 0));
+('counter_1.clk' = ((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2))) ZEXT 0));
+('counter_2.out' = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2)::'autoclk2fflogic.cc_c_222_c_execute35') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute39' : 'autoclk2fflogic.cc_c_246_c_execute40')) ZEXT 0));
+('clk4' = (((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2) ZEXT 0));
+('clk3' = (((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2) ZEXT 0));
+('clk1' = ((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2))) ZEXT 0));
+('counter_3.out' = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2)::'autoclk2fflogic.cc_c_222_c_execute46') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute50' : 'autoclk2fflogic.cc_c_246_c_execute51')) ZEXT 0));
+('adder.in4' = ((('rst' = 1_1) ? 0_2 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2)::'autoclk2fflogic.cc_c_222_c_execute57') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute61' : 'autoclk2fflogic.cc_c_246_c_execute62')) ZEXT 0));
+('adder.in3' = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2)::'autoclk2fflogic.cc_c_222_c_execute46') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute50' : 'autoclk2fflogic.cc_c_246_c_execute51')) ZEXT 0));
+('adder.in1' = ((('rst' = 1_1) ? 0_8 : (((((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2)))::'autoclk2fflogic.cc_c_222_c_execute24') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute28' : 'autoclk2fflogic.cc_c_246_c_execute29')) ZEXT 0));
+('val4' = ((('rst' = 1_1) ? 0_2 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2)::'autoclk2fflogic.cc_c_222_c_execute57') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute61' : 'autoclk2fflogic.cc_c_246_c_execute62')) ZEXT 0));
+('val3' = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2)::'autoclk2fflogic.cc_c_222_c_execute46') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute50' : 'autoclk2fflogic.cc_c_246_c_execute51')) ZEXT 0));
+('val1' = ((('rst' = 1_1) ? 0_8 : (((((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2)))::'autoclk2fflogic.cc_c_222_c_execute24') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute28' : 'autoclk2fflogic.cc_c_246_c_execute29')) ZEXT 0));
+('sel' = ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) ZEXT 0));
+('counter_clk.rst' = ('rst' ZEXT 0));
+('counter_clk.out' = ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) ZEXT 0));
+('counter_clk.clk' = ('clk' ZEXT 0));
+('counter_4.rst' = ('rst' ZEXT 0));
+
+TRANS
+(next('autoclk2fflogic.cc_c_246_c_execute73') = (('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')));
+(next('autoclk2fflogic.cc_c_222_c_execute24') = (! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2))));
+(next('autoclk2fflogic.cc_c_222_c_execute57') = ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2));
+(next('autoclk2fflogic.cc_c_246_c_execute29') = (('rst' = 1_1) ? 0_8 : (((((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2)))::'autoclk2fflogic.cc_c_222_c_execute24') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute28' : 'autoclk2fflogic.cc_c_246_c_execute29')));
+(next('autoclk2fflogic.cc_c_245_c_execute28') = ((('rst' = 1_1) ? 0_8 : (((((! (! ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 0_2)))::'autoclk2fflogic.cc_c_222_c_execute24') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute28' : 'autoclk2fflogic.cc_c_246_c_execute29')) + 1_8));
+(next('autoclk2fflogic.cc_c_246_c_execute62') = (('rst' = 1_1) ? 0_2 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2)::'autoclk2fflogic.cc_c_222_c_execute57') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute61' : 'autoclk2fflogic.cc_c_246_c_execute62')));
+(next('autoclk2fflogic.cc_c_245_c_execute72') = ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) + 1_2));
+(next('autoclk2fflogic.cc_c_222_c_execute46') = ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2));
+(next('autoclk2fflogic.cc_c_246_c_execute40') = (('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2)::'autoclk2fflogic.cc_c_222_c_execute35') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute39' : 'autoclk2fflogic.cc_c_246_c_execute40')));
+(next('autoclk2fflogic.cc_c_245_c_execute39') = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2)::'autoclk2fflogic.cc_c_222_c_execute35') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute39' : 'autoclk2fflogic.cc_c_246_c_execute40')) + 1_4));
+(next('autoclk2fflogic.cc_c_246_c_execute51') = (('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2)::'autoclk2fflogic.cc_c_222_c_execute46') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute50' : 'autoclk2fflogic.cc_c_246_c_execute51')));
+(next('autoclk2fflogic.cc_c_222_c_execute35') = ((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 1_2));
+(next('autoclk2fflogic.cc_c_245_c_execute50') = ((('rst' = 1_1) ? 0_4 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 2_2)::'autoclk2fflogic.cc_c_222_c_execute46') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute50' : 'autoclk2fflogic.cc_c_246_c_execute51')) + 1_4));
+(next('autoclk2fflogic.cc_c_245_c_execute61') = ((('rst' = 1_1) ? 0_2 : ((((((('rst' = 1_1) ? 0_2 : (((('clk'::'autoclk2fflogic.cc_c_222_c_execute68') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute72' : 'autoclk2fflogic.cc_c_246_c_execute73')) bvcomp 3_2)::'autoclk2fflogic.cc_c_222_c_execute57') bvcomp 2_2) = 1_1) ? 'autoclk2fflogic.cc_c_245_c_execute61' : 'autoclk2fflogic.cc_c_246_c_execute62')) + 1_2));
+(next('autoclk2fflogic.cc_c_222_c_execute68') = 'clk');
+
+FUNC

@@ -1,0 +1,77 @@
+MODULE main
+
+INVARSPEC ("self.out" < 0ud16_4);
+
+-- ASSUMPTIONS
+INVAR ((! "en_clr") -> (! "self.clr"));
+
+VAR
+"a.in0" : word[16];
+"a.in1" : word[16];
+"a.out" : word[16];
+"r.clrMux.in0" : word[16];
+"r.clrMux.in1" : word[16];
+"r.clrMux.out" : word[16];
+"r.clrMux.sel" : boolean;
+"r.reg0.out" : word[16];
+"r.reg0.clk" : boolean;
+"r.reg0.in" : word[16];
+"self.clk" : boolean;
+"self.clr" : boolean;
+"self.out" : word[16];
+"en_clr" : boolean;
+"H__state_id6__H" : word[2];
+"fifo_1.cell_0" : word[8];
+"fifo_1.cell_1" : word[8];
+"fifo_1.cell_2" : word[8];
+"fifo_1.cell_3" : word[8];
+"fifo_1.cell_4" : word[8];
+"fifo_1.cell_5" : word[8];
+"cell_0" : word[8];
+"cell_1" : word[8];
+"cell_2" : word[8];
+"cell_3" : word[8];
+"cell_4" : word[8];
+"cell_5" : word[8];
+"input" : word[8];
+"clk1" : word[1];
+"clk2" : word[1];
+"rst" : word[1];
+"output" : word[8];
+"out" : word[8];
+
+INIT
+TRUE &
+("r.reg0.out" = 0ud16_0) &
+(! "en_clr") &
+("H__state_id6__H" = 0ud2_0) &
+(! "en_clr");
+
+INVAR
+((! "en_clr") -> (! "self.clr")) &
+TRUE &
+(("a.in0" + "a.in1") = "a.out") &
+("r.clrMux.out" = ((! "r.clrMux.sel") ? "r.clrMux.in0" : "r.clrMux.in1")) &
+("r.reg0.out" = "self.out") &
+("r.reg0.clk" <-> "self.clk") &
+("r.clrMux.sel" <-> "self.clr") &
+("r.clrMux.out" = "r.reg0.in") &
+("r.clrMux.in1" = 0ud16_0) &
+("a.out" = "r.clrMux.in0") &
+("a.in1" = "r.reg0.out") &
+("a.in0" = 0ud16_1) &
+("H__state_id6__H" <= 0ud2_3) &
+TRUE &
+(("H__state_id6__H" = 0ud2_2) -> (! "en_clr")) &
+(("H__state_id6__H" = 0ud2_1) -> (! "en_clr")) &
+(("H__state_id6__H" = 0ud2_0) -> (! "en_clr"));
+
+TRANS
+TRUE &
+(next("r.reg0.out") = (((! "r.reg0.clk") & next("r.reg0.clk")) ? "r.reg0.in" : "r.reg0.out")) &
+((! "en_clr") -> ((0ud16_5 < "self.out") <-> next("en_clr"))) &
+("en_clr" -> next("en_clr")) &
+(("H__state_id6__H" = 0ud2_3) -> (next("H__state_id6__H") = 0ud2_3)) &
+(("H__state_id6__H" = 0ud2_2) -> ((next("H__state_id6__H") = 0ud2_2) | (next("H__state_id6__H") = 0ud2_3))) &
+(("H__state_id6__H" = 0ud2_1) -> (next("H__state_id6__H") = 0ud2_2)) &
+(("H__state_id6__H" = 0ud2_0) -> (next("H__state_id6__H") = 0ud2_1));

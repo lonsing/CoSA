@@ -1,0 +1,98 @@
+MODULE main
+
+VAR
+"rst" : word[1];
+"reset_done" : boolean;
+"reset_performed" : boolean;
+"counter_1.out" : word[8];
+"counter_1.clk" : word[1];
+"counter_1.rst" : word[1];
+"H__state_id5__H" : word[2];
+"out" : word[16];
+"val1" : word[8];
+"counter_3.rst" : word[1];
+"val2" : word[4];
+"val3" : word[4];
+"val4" : word[2];
+"sel" : word[2];
+"clk1" : word[1];
+"clk2" : word[1];
+"clk3" : word[1];
+"clk4" : word[1];
+"clk" : word[1];
+"counter_2.out" : word[4];
+"counter_2.clk" : word[1];
+"counter_2.rst" : word[1];
+"counter_4.rst" : word[1];
+"counter_4.out" : word[2];
+"counter_4.clk" : word[1];
+"adder.in1" : word[8];
+"adder.in2" : word[4];
+"adder.in3" : word[4];
+"adder.in4" : word[2];
+"adder.out" : word[16];
+"counter_3.out" : word[4];
+"counter_clk.rst" : word[1];
+"counter_clk.out" : word[2];
+"counter_clk.clk" : word[1];
+"counter_3.clk" : word[1];
+
+INIT
+TRUE &
+("H__state_id5__H" = 0ud2_0) &
+(! "reset_performed") &
+(! "reset_done") &
+("rst" = 0ud1_0);
+
+INVAR
+TRUE &
+("counter_3.rst" = "rst") &
+("val3" = "counter_3.out") &
+("counter_3.clk" = "clk3") &
+("counter_2.rst" = "rst") &
+("val2" = "counter_2.out") &
+("counter_2.clk" = "clk2") &
+("counter_clk.rst" = "rst") &
+("sel" = "counter_clk.out") &
+("counter_clk.clk" = "clk") &
+("adder.out" = extend ( (extend ( (("adder.in1" + extend ( "adder.in2", 4)) + extend ( "adder.in3", 4)), 1) + extend ( extend ( "adder.in4", 6), 1)), 7)) &
+("clk4" = (("sel" = 0ud2_3) ? 0ud1_1 : 0ud1_0)) &
+("clk3" = (("sel" = 0ud2_2) ? 0ud1_1 : 0ud1_0)) &
+("clk2" = (("sel" = 0ud2_1) ? 0ud1_1 : 0ud1_0)) &
+("clk1" = (("sel" = 0ud2_0) ? 0ud1_1 : 0ud1_0)) &
+("counter_4.rst" = "rst") &
+("val4" = "counter_4.out") &
+("counter_4.clk" = "clk4") &
+("out" = "adder.out") &
+("adder.in4" = "val4") &
+("adder.in3" = "val3") &
+("adder.in2" = "val2") &
+("adder.in1" = "val1") &
+("counter_1.rst" = "rst") &
+("val1" = "counter_1.out") &
+("counter_1.clk" = "clk1") &
+("H__state_id5__H" <= 0ud2_2) &
+(("H__state_id5__H" = 0ud2_2) -> "reset_performed") &
+(("H__state_id5__H" = 0ud2_1) -> ((! "reset_performed") & ("rst" = 0ud1_1) & "reset_done")) &
+(("H__state_id5__H" = 0ud2_0) -> ((! "reset_performed") & (! "reset_done") & ("rst" = 0ud1_0)));
+
+TRANS
+TRUE &
+(((! ((((next("counter_4.rst") = 0ud1_1) & ("counter_4.rst" = 0ud1_0)) | (("counter_4.clk" = 0ud1_0) & (next("counter_4.clk") = 0ud1_1))) & (next("counter_4.rst") = 0ud1_1))) & (! ((((next("counter_4.rst") = 0ud1_1) & ("counter_4.rst" = 0ud1_0)) | (("counter_4.clk" = 0ud1_0) & (next("counter_4.clk") = 0ud1_1))) & (! (next("counter_4.rst") = 0ud1_1))))) -> (next("counter_4.out") = "counter_4.out")) &
+(((((next("counter_4.rst") = 0ud1_1) & ("counter_4.rst" = 0ud1_0)) | (("counter_4.clk" = 0ud1_0) & (next("counter_4.clk") = 0ud1_1))) & (! (next("counter_4.rst") = 0ud1_1))) -> (next("counter_4.out") = (extend ( "counter_4.out", 30) + 0ud32_1)[1:0])) &
+(((((next("counter_4.rst") = 0ud1_1) & ("counter_4.rst" = 0ud1_0)) | (("counter_4.clk" = 0ud1_0) & (next("counter_4.clk") = 0ud1_1))) & (next("counter_4.rst") = 0ud1_1)) -> (next("counter_4.out") = 0ud2_0)) &
+(((! ((! (next("counter_clk.rst") = 0ud1_1)) & (((next("counter_clk.rst") = 0ud1_1) & ("counter_clk.rst" = 0ud1_0)) | (("counter_clk.clk" = 0ud1_0) & (next("counter_clk.clk") = 0ud1_1))))) & (! ((next("counter_clk.rst") = 0ud1_1) & (((next("counter_clk.rst") = 0ud1_1) & ("counter_clk.rst" = 0ud1_0)) | (("counter_clk.clk" = 0ud1_0) & (next("counter_clk.clk") = 0ud1_1)))))) -> (next("counter_clk.out") = "counter_clk.out")) &
+(((! (next("counter_clk.rst") = 0ud1_1)) & (((next("counter_clk.rst") = 0ud1_1) & ("counter_clk.rst" = 0ud1_0)) | (("counter_clk.clk" = 0ud1_0) & (next("counter_clk.clk") = 0ud1_1)))) -> (next("counter_clk.out") = (extend ( "counter_clk.out", 30) + 0ud32_1)[1:0])) &
+(((next("counter_clk.rst") = 0ud1_1) & (((next("counter_clk.rst") = 0ud1_1) & ("counter_clk.rst" = 0ud1_0)) | (("counter_clk.clk" = 0ud1_0) & (next("counter_clk.clk") = 0ud1_1)))) -> (next("counter_clk.out") = 0ud2_0)) &
+(((! (((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | (("counter_1.clk" = 0ud1_0) & (next("counter_1.clk") = 0ud1_1))) & (! (next("counter_1.rst") = 0ud1_1)))) & (! ((next("counter_1.rst") = 0ud1_1) & ((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | (("counter_1.clk" = 0ud1_0) & (next("counter_1.clk") = 0ud1_1)))))) -> (next("counter_1.out") = "counter_1.out")) &
+((((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | (("counter_1.clk" = 0ud1_0) & (next("counter_1.clk") = 0ud1_1))) & (! (next("counter_1.rst") = 0ud1_1))) -> (next("counter_1.out") = (extend ( "counter_1.out", 24) + 0ud32_1)[7:0])) &
+(((next("counter_1.rst") = 0ud1_1) & ((("counter_1.rst" = 0ud1_0) & (next("counter_1.rst") = 0ud1_1)) | (("counter_1.clk" = 0ud1_0) & (next("counter_1.clk") = 0ud1_1)))) -> (next("counter_1.out") = 0ud8_0)) &
+(((! ((! (next("counter_3.rst") = 0ud1_1)) & ((("counter_3.clk" = 0ud1_0) & (next("counter_3.clk") = 0ud1_1)) | (("counter_3.rst" = 0ud1_0) & (next("counter_3.rst") = 0ud1_1))))) & (! ((next("counter_3.rst") = 0ud1_1) & ((("counter_3.clk" = 0ud1_0) & (next("counter_3.clk") = 0ud1_1)) | (("counter_3.rst" = 0ud1_0) & (next("counter_3.rst") = 0ud1_1)))))) -> (next("counter_3.out") = "counter_3.out")) &
+(((! (next("counter_3.rst") = 0ud1_1)) & ((("counter_3.clk" = 0ud1_0) & (next("counter_3.clk") = 0ud1_1)) | (("counter_3.rst" = 0ud1_0) & (next("counter_3.rst") = 0ud1_1)))) -> (next("counter_3.out") = (extend ( "counter_3.out", 28) + 0ud32_1)[3:0])) &
+(((next("counter_3.rst") = 0ud1_1) & ((("counter_3.clk" = 0ud1_0) & (next("counter_3.clk") = 0ud1_1)) | (("counter_3.rst" = 0ud1_0) & (next("counter_3.rst") = 0ud1_1)))) -> (next("counter_3.out") = 0ud4_0)) &
+(((! (((("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1)) | (("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1))) & (! (next("counter_2.rst") = 0ud1_1)))) & (! ((next("counter_2.rst") = 0ud1_1) & ((("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1)) | (("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1)))))) -> (next("counter_2.out") = "counter_2.out")) &
+((((("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1)) | (("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1))) & (! (next("counter_2.rst") = 0ud1_1))) -> (next("counter_2.out") = (extend ( "counter_2.out", 28) + 0ud32_1)[3:0])) &
+(((next("counter_2.rst") = 0ud1_1) & ((("counter_2.clk" = 0ud1_0) & (next("counter_2.clk") = 0ud1_1)) | (("counter_2.rst" = 0ud1_0) & (next("counter_2.rst") = 0ud1_1)))) -> (next("counter_2.out") = 0ud4_0)) &
+(("H__state_id5__H" = 0ud2_2) -> (next("H__state_id5__H") = 0ud2_2)) &
+(("H__state_id5__H" = 0ud2_1) -> (next("H__state_id5__H") = 0ud2_2)) &
+(("H__state_id5__H" = 0ud2_0) -> (next("H__state_id5__H") = 0ud2_1));
